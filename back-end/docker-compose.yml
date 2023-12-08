@@ -1,14 +1,14 @@
 version: '3'
 services:
-  strapi-test-1:
-    container_name: strapi-test-1
+  kayfo-api-staging:
+    container_name: kayfo-api-staging
     build: .
-    image: strapi-test-1:latest
+    image: kayfo-api-staging:latest
     restart: unless-stopped
     env_file: .env
     environment:
       DATABASE_CLIENT: ${DATABASE_CLIENT}
-      DATABASE_HOST: strapi-test-1DB
+      DATABASE_HOST: kayfo-api-stagingDB
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PORT: ${DATABASE_PORT}
@@ -27,12 +27,12 @@ services:
     ports:
       - '1337:1337'
     networks:
-      - strapi-test-1
+      - kayfo-api-staging
     depends_on:
-      - strapi-test-1DB
+      - kayfo-api-stagingDB
       
-  strapi-test-1DB:
-    container_name: strapi-test-1DB
+  kayfo-api-stagingDB:
+    container_name: kayfo-api-stagingDB
     platform: linux/amd64 #for platform error on Apple M1 chips
     restart: unless-stopped
     env_file: .env
@@ -45,30 +45,30 @@ services:
       MYSQL_DATABASE: ${DATABASE_NAME}
       MYSQL_ROOT_HOST: '%'
     volumes:
-      - strapi-test-1-data:/var/lib/mysql
+      - kayfo-api-staging-data:/var/lib/mysql
       #- ./data:/var/lib/postgresql/data/ # if you want to use a bind folder
     ports:
       - '3306:3306'
     networks:
-      - strapi-test-1
+      - kayfo-api-staging
       
-  strapi-test-1Adminer:
-    container_name: strapi-test-1Adminer
+  kayfo-api-stagingAdminer:
+    container_name: kayfo-api-stagingAdminer
     image: adminer
     restart: unless-stopped
     ports:
       - '9090:8080'
     environment:
-      - ADMINER_DEFAULT_SERVER=strapi-test-1DB
+      - ADMINER_DEFAULT_SERVER=kayfo-api-stagingDB
     networks:
-      - strapi-test-1
+      - kayfo-api-staging
     depends_on:
-      - strapi-test-1DB
+      - kayfo-api-stagingDB
 
 volumes:
-  strapi-test-1-data:
+  kayfo-api-staging-data:
 
 networks:
-  strapi-test-1:
-    name: Strapi-test-1
+  kayfo-api-staging:
+    name: kayfo-api-staging
     driver: bridge
