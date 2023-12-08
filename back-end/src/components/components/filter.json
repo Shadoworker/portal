@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_components_filters",
+  "info": {
+    "displayName": "filter",
+    "icon": "filter",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "enumeration",
+      "enum": [
+        "classic",
+        "trending",
+        "fun"
+      ]
+    }
+  }
+}
