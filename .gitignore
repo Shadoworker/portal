@@ -29,6 +29,8 @@ dist/
 # JetBrains IDE
 .idea/
 
+.next/
+
 # Unit test reports
 TEST*.xml
 
