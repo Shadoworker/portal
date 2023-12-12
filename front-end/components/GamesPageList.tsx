@@ -9,6 +9,8 @@ import { bindActionCreators} from 'redux';
 import * as mainActions from '../redux/main/mainActions';
 import Image from 'next/image';
 import { withRouter } from 'next/router';
+import contentService from '../services/content.service';
+import { baseUrl } from '../services/apiUrl';
 
 
 interface Props {
@@ -32,33 +34,61 @@ State> {
     super(props);
     this.state = {
       index : 0,
-      items : gameslistGames
+      items : []
     };
   }
 
   componentDidMount() {
  
-    this.setLayout();
-
-    setTimeout(() => {
-      
-        new Isotope(".grid", {
-          itemSelector: ".grid-item",
-          layoutMode: "masonry",
-          masonry: {
-            columnWidth: 120,
-          },
-        });
-
-    }, 100);
-
+    this.getGames();
 
   }
 
 
-  setLayout = ()=>{
+  
+  getGames = ()=>{
 
-    var items = [...this.state.items];
+    var rubricId = this.props.rubricId || 1;
+
+    console.log(rubricId)
+
+    contentService.getRubricGames(rubricId)
+    .then((d:any)=>{
+
+      var games = d.data.attributes.games.data;
+
+      games.forEach(g => {
+        if(g.attributes.tags == null) g.attributes.tags = [""];
+        else g.attributes.tags = g.attributes.tags.split(",")
+      });
+
+      this.setState({items : games})
+      // this.props.mainActions.setAllGames({key:rubricId, games : games})
+      // console.log(games)
+
+      this.setLayout(games);
+
+      setTimeout(() => {
+        
+          new Isotope(".grid", {
+            itemSelector: ".grid-item",
+            layoutMode: "masonry",
+            masonry: {
+              columnWidth: 120,
+            },
+          });
+  
+      }, 100);
+
+
+    })
+    .catch((e)=>{console.log("Error while getting games")})
+
+  }
+
+  setLayout = (_items)=>{
+
+    var items = [..._items];
     var patternI = 0;
 
     for (let i = 0; i < items.length; i++) {
@@ -102,8 +132,8 @@ State> {
                                     
                   return  (
                   <div key={index} className={`grid-item ${width2} ${height2}`} onClick={()=>this.gotoGameDetail(item, index)} >
-                    <Tooltip placement='top' title={item.title}>
-                      <Image src={item.logo} alt="" style={{width:'100%', height:'100%', objectFit:'cover', borderRadius:6}}/>
+                    <Tooltip placement='top' title={item.attributes.title}>
+                      <Image src={baseUrl + item.attributes.banner.data.attributes.url} width={350} height={350} alt="" style={{width:'100%', height:'100%', objectFit:'cover', borderRadius:6}}/>
                     </Tooltip>
                   </div>)
 
@@ -118,7 +148,7 @@ State> {
 
             <div className='kayfo-games-pagination-container'>
 
-              <Pagination className='kayfo-games-pagination'>
+              {/* <Pagination className='kayfo-games-pagination'>
                 <Pagination.Prev >Précédent</Pagination.Prev>
                 <Pagination.Item>{1}</Pagination.Item>
  
@@ -126,7 +156,7 @@ State> {
 
                 <Pagination.Item>{3}</Pagination.Item>
                 <Pagination.Next>Suivant</Pagination.Next>
-              </Pagination>
+              </Pagination> */}
 
             </div>
         </Container>

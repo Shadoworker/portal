@@ -2,6 +2,8 @@ import React, { Component, useState } from 'react';
 import { Container, Row, Col, ListGroup, Button, Pagination, Carousel, Card } from 'react-bootstrap';
 import gameslistGames from '../services/mocks/gameslistGames';
 import Image from 'next/image';
+import { baseUrl } from '../services/apiUrl';
+import contentService from '../services/content.service';
 
 interface Props {
 
@@ -11,7 +13,8 @@ interface Props {
 interface State {
 
   index : number,
-  item : any
+  item : any,
+  cardWidth :any
 }
 
 
@@ -24,7 +27,8 @@ State> {
       super(props);
       this.state = {
         index : 0,
-        item : this.props.game || {}
+        item : this.props.game || {},
+        cardWidth : 600
       };
     }
   
@@ -32,7 +36,15 @@ State> {
   componentDidMount(): void {
  
     this.setState({item : this.props.game})
+
+    var card = document.querySelector('.kayfo-game-detail-container');
+
+    var cardWidth = card?.getBoundingClientRect().width;
+
+    this.setState({cardWidth})
+
   }
+
 
  componentDidUpdate(prevProps: any, prevState: Readonly<State>, snapshot?: any): void {
   
@@ -54,13 +66,13 @@ State> {
               <Col >
                 <Card className='kayfo-game-detail-container'>
                   <div style={{position:'relative'}}>
-                    <Image  src={this.props.game.banner} className='kayfo-game-detail-img' style={{objectFit:'cover', width:'100%', minHeight:380}} alt='' />
-                    <Button href={this.props.game.url} target="_blank" className='kayfo-playnow-btn'>Jouer maintenant</Button>
+                    <Image  src={baseUrl + this.props.game.attributes.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth} height={380} style={{objectFit:'cover', width:'100%', minHeight:380}} alt='' />
+                    <Button href={this.props.game.attributes.link} target="_blank" className='kayfo-playnow-btn'>Jouer maintenant</Button>
                   </div>
                   <Card.Body>
                     <Card.Title>
                       <Row>
-                        <Col xs={8} style={{fontWeight:'bolder'}} >{this.props.game.title} - By Kayfo Games</Col>
+                        <Col xs={8} style={{fontWeight:'bolder'}} >{this.props.game.attributes.title} - By Kayfo Games</Col>
                         <Col xs={4} style={{display:'flex', justifyContent:'flex-end'}}>
                           <Image className='kayfo-addfav' src={require("../assets/icons/add-to-favs-icon.png")} alt="" />
                         </Col>

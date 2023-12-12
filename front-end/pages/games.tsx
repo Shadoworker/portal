@@ -45,7 +45,7 @@ State> {
             <Header />
             <CategoriesCards />
             <div className='kayfo-body-content'>
-              <GamesPageList title={this.props.router.query.title} />
+              <GamesPageList title={this.props.router.query.title} rubricId={this.props.router.query.rubricId} />
 
               <CategoriesFooter />
 

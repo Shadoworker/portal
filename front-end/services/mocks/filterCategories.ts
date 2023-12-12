@@ -1,6 +1,11 @@
 var filterCatgories = [
 
     {
+        name:"Toutes",
+        tag : "",
+        link:""
+    },
+    {
         name:"Nouveautés",
         tag : "New",
         link:""

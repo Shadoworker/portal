@@ -8,17 +8,21 @@ import * as mainActions from '../redux/main/mainActions'
 import { Tooltip } from '@mui/material';
 import Image from 'next/image';
 import { withRouter } from 'next/router';
+import contentService from '../services/content.service';
+import { baseUrl } from '../services/apiUrl';
 
 interface Props {
 
   title:string,
+  rubricId:any,
   items : any[]
 }
 
 interface State {
 
   index : number,
-  items : any[]
+  items : any[],
+  completed : boolean
 }
  
  
@@ -31,7 +35,8 @@ State> {
     super(props);
     this.state = {
       index : 0,
-      items : this.props.items
+      items :[],
+      completed : false
     };
 
   }
@@ -39,6 +44,30 @@ State> {
   componentDidMount(): void {
  
     // this.applyFilter();
+    this.getGames();
+  }
+
+  getGames = ()=>{
+
+    var rubricId = this.props.rubricId;
+
+    contentService.getRubricGames(rubricId)
+    .then((d:any)=>{
+
+      var games = d.data.attributes.games.data;
+
+      games.forEach(g => {
+        if(g.attributes.tags == null) g.attributes.tags = [""];
+        else g.attributes.tags = g.attributes.tags.split(",")
+      });
+
+      this.setState({items : games, completed : true})
+       this.props.mainActions.setAllGames({key:rubricId, games : games})
+      // console.log(games)
+
+    })
+    .catch((e)=>{console.log("Error while getting games")})
+
   }
 
   applyFilter = () =>{
@@ -54,7 +83,7 @@ State> {
 
   gotoGames = (_title:string)=>{
     const { router } = this.props;
-    router.push({pathname:"/games", query : {title : _title} })
+    router.push({pathname:"/games", query : {title : _title, rubricId : this.props.rubricId} })
   }
 
   gotoGameDetail = (_game:any, _index:number)=>{
@@ -77,19 +106,19 @@ State> {
 
                 <div style={{minWidth:"100%", display:'flex', flexDirection:'row'}}>
 
-                    {this.state.items.filter(item => item.tags.includes(this.props.mainState.filterTag)).map((item,index)=>
+                    {this.state.items.filter(item => item.attributes.tags.includes(this.props.mainState.filterTag)).map((item,index)=>
                         <div className='kayfo-masonry-container' key={index} style={{display:'flex', maxHeight:110, flexDirection:'column'}}>
                             <Col className='kayfo-masonry-item' style={{maxHeight:110, minWidth:110}}  onClick={()=>this.gotoGameDetail(item,index)} >
-                              <Tooltip placement='top' title={item.title}>
-                                <Image src={item.logo} alt="" style={{width:110, height:'100%', objectFit:'cover', borderRadius:6}}/>
+                              <Tooltip placement='top' title={item.attributes.title}>
+                                <Image src={baseUrl + item.attributes.icon.data.attributes.url} alt="" width={110} height={110} style={{width:110, height:'100%', objectFit:'cover', borderRadius:6}}/>
                               </Tooltip>
                             </Col>
                         </div>
                     )}
                     
-                    {this.state.items.filter(item => item.tags.includes(this.props.mainState.filterTag)).length == 0 &&
+                    {this.state.items.filter(item => item.attributes.tags.includes(this.props.mainState.filterTag)).length == 0 &&
                       <Col className='kayfo-filter-no-result-box'>
-                        Aucun résultat
+                        {this.state.completed ? 'Aucun résultat' : 'Chargement...'}
                       </Col>
                     }
 

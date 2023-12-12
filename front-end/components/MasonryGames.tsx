@@ -10,16 +10,22 @@ import * as mainActions from '../redux/main/mainActions'
 import { Tooltip } from '@mui/material';
 import Image from 'next/image';
 import { withRouter } from 'next/router';
+import contentService from '../services/content.service';
+import { baseUrl } from '../services/apiUrl';
 
 
 interface Props {
-
+  title:string,
+  rubricId:any,
+  items : any[]
   }
   
 interface State {
 
     index : number,
-    items : any[]
+    items : any[],
+    completed : boolean,
+    rendererTime : string
 }
 
 
@@ -31,19 +37,44 @@ State> {
     super(props);
     this.state = {
       index : 0,
-      items : featuredGames
+      items : [],//featuredGames,
+      completed : false,
+      rendererTime : new Date().getTime().toString()
     };
   }
 
   
-  componentDidMount(): void {
- 
+  componentDidMount(){
+
+    this.getGames();
+  }
+
+  getGames = ()=>{
+
+    var rubricId = this.props.rubricId;
+
+    contentService.getRubricGames(rubricId)
+    .then((d:any)=>{
+
+      var games = d.data.attributes.games.data;
+
+      games.forEach(g => {
+        if(g.attributes.tags == null) g.attributes.tags = [""];
+        else g.attributes.tags = g.attributes.tags.split(",")
+      });
+
+      this.setState({items : games, completed : true})
+       this.props.mainActions.setAllGames({key:rubricId, games : games})
+      // console.log(games)
+
+    })
+    .catch((e)=>{console.log("Error while getting games")})
 
   }
 
   gotoGames = (_title:string)=>{
     const { router } = this.props;
-    router.push({pathname:"/games", query : {title : _title} })
+    router.push({pathname:"/games", query : {title : _title, rubricId : this.props.rubricId} })
   }
 
   gotoGameDetail = (_game:any, _index:number)=>{
@@ -57,7 +88,6 @@ State> {
   renderMasonry = (_items:any[])=>{
 
        // remove doublons ... ?
-        
         var patternI = 0;
         var itemI = 0;
 
@@ -103,15 +133,15 @@ State> {
                 var r = (
                 <div key={firstIndex} className='kayfo-masonry-container'>
                     <Col className='kayfo-masonry-item' style={{minWidth:'50%'}} onClick={()=>this.gotoGameDetail(element, firstIndex)}  >
-                      <Tooltip placement='top' title={element.title}>
-                        <Image src={element.logo} alt="" style={{width:110, height:'auto'}}/>
+                      <Tooltip placement='top' title={element.attributes.title}>
+                        <Image src={baseUrl + element.attributes.icon.data.attributes.url} alt="" width={110} height={110} style={{width:110, height:'auto'}}/>
                       </Tooltip>
                     </Col>
 
                     {renderSecond && 
                     <Col key={secondIndex} className='kayfo-masonry-item' style={{minWidth:'50%'}} onClick={()=>this.gotoGameDetail(nextElement, secondIndex)} >
-                        <Tooltip placement='top' title={nextElement.title}>
-                          <Image src={nextElement.logo} alt="" style={{width:110, height:'auto'}}/>
+                        <Tooltip placement='top' title={nextElement.attributes.title}>
+                          <Image src={baseUrl + nextElement.attributes.icon.data.attributes.url} alt="" width={110} height={110} style={{width:110, height:'auto'}}/>
                         </Tooltip>
                     </Col>}
                 </div>)
@@ -125,8 +155,8 @@ State> {
                 var r = (
                     <div  key={firstIndex} className='kayfo-masonry-container' style={{display:'flex', minHeight:234, flexDirection:'column', justifyContent:'space-between'}}>
                         <Col className='kayfo-masonry-item' style={{minHeight:234}} onClick={()=>this.gotoGameDetail(element,firstIndex)} >
-                            <Tooltip placement='top' title={element.title}>
-                              <Image src={element.logo} alt="" style={{width:234, height:'auto'}}/>
+                            <Tooltip placement='top' title={element.attributes.title}>
+                              <Image src={baseUrl + element.attributes.icon.data.attributes.url} alt="" width={234} height={110} style={{width:234, height:'auto'}}/>
                             </Tooltip>
                         </Col>
                     </div>)
@@ -147,25 +177,27 @@ State> {
    render(): React.ReactNode {
      return(
         <Container>
-            <Row className='kayfo-block-header' onClick={()=>this.gotoGames("Nos meilleurs jeux")}>
-             <div className='kayfo-block-title'><span>Nos meilleures sélections</span></div>
+            <Row className='kayfo-block-header' onClick={()=>this.gotoGames(this.props.title)}>
+             <div className='kayfo-block-title'><span>{this.props.title}</span></div>
              <div className='kayfo-block-arrow' ><Image  src={require("../assets/icons/arrow.png")} alt="" /></div>
             </Row>
             <Row>
               <Col className='kayfo-masonry-main' style={{overflowX:'auto', overflowY:'hidden'}}>
 
-                {this.state.items.filter(item => item.tags.includes(this.props.mainState.filterTag)).length > 0 &&
+                {this.state.items.filter(item => item.attributes.tags.includes(this.props.mainState.filterTag)).length > 0 &&
                 <div style={{minWidth:"100%", display:'flex', flexDirection:'row'}}>
 
-                    {this.renderMasonry(this.state.items.filter(item => item.tags.includes(this.props.mainState.filterTag))).map((item,index)=>
-                        item
+                    {this.renderMasonry(this.state.items.filter(item => item.attributes.tags.includes(this.props.mainState.filterTag))).map((item,index)=>
+                        {
+                          return item
+                        }
                     )} 
 
                 </div>
                  }
-                 {this.state.items.filter(item => item.tags.includes(this.props.mainState.filterTag)).length == 0 &&
+                 {this.state.items.filter(item => item.attributes.tags.includes(this.props.mainState.filterTag)).length == 0 &&
                   <Col className='kayfo-filter-no-result-box'>
-                    Aucun résultat
+                    {this.state.completed ? 'Aucun résultat' : 'Chargement...'}
                   </Col>
                   }
              </Col>
