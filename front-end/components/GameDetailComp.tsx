@@ -27,7 +27,7 @@ State> {
       super(props);
       this.state = {
         index : 0,
-        item : this.props.game || {},
+        item : null,
         cardWidth : 600
       };
     }
@@ -35,7 +35,10 @@ State> {
 
   componentDidMount(): void {
  
-    this.setState({item : this.props.game})
+    var game = JSON.parse(localStorage.getItem("game") || '{}')
+     
+    this.setState({item : game})
+    // localStorage.setItem("game", JSON.stringify(game))
 
     var card = document.querySelector('.kayfo-game-detail-container');
 
@@ -64,22 +67,23 @@ State> {
         <Container className='' style={{padding:0, position:'relative'}}>
             <Row className='' style={{width:'100%', marginLeft:'auto', marginRight:'auto', marginTop:5}}>
               <Col >
-                <Card className='kayfo-game-detail-container'>
+                {this.state.item &&
+                  <Card className='kayfo-game-detail-container'>
                   <div style={{position:'relative'}}>
-                    <Image  src={baseUrl + this.props.game.attributes.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth} height={380} style={{objectFit:'cover', width:'100%', minHeight:380}} alt='' />
-                    <Button href={this.props.game.attributes.link} target="_blank" className='kayfo-playnow-btn'>Jouer maintenant</Button>
+                    <Image  src={baseUrl + this.state.item?.attributes?.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth || 600} height={380} style={{objectFit:'cover', width:'100%', minHeight:250}} alt='' />
+                    <Button href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn'>Jouer maintenant</Button>
                   </div>
                   <Card.Body>
                     <Card.Title>
                       <Row>
-                        <Col xs={8} style={{fontWeight:'bolder'}} >{this.props.game.attributes.title} - By Kayfo Games</Col>
+                        <Col xs={8} style={{fontWeight:'bolder'}} >{this.state.item?.attributes?.title} - {this.state.item?.attributes?.developer}</Col>
                         <Col xs={4} style={{display:'flex', justifyContent:'flex-end'}}>
                           <Image className='kayfo-addfav' src={require("../assets/icons/add-to-favs-icon.png")} alt="" />
                         </Col>
                       </Row>
                     </Card.Title>
                     <Card.Text style={{fontWeight:400, fontSize:'larger'}}>
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint reprehenderit sapiente commodi perferendis asperiores est unde quia 
+                      {this.state.item?.attributes?.description != null ? this.state.item?.attributes?.description : 'Aucune description'} 
                     </Card.Text>
 
                     <Col style={{display:'flex', alignItems:'center'}}>
@@ -107,6 +111,7 @@ State> {
 
                   </Card.Body>
                 </Card>
+                }
               </Col>
              
               {/* <Carousel>

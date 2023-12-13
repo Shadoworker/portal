@@ -80,6 +80,7 @@ State> {
     const { router } = this.props;
 
     this.props.mainActions.setGame(_game);
+localStorage.setItem("game", JSON.stringify(_game))
     router.push({pathname:"/gamedetail"})
     
   }
