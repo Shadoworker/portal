@@ -63,9 +63,11 @@ State> {
         else g.attributes.tags = g.attributes.tags.split(",")
       });
 
+      games = games.filter(e=>e.attributes.published != false);
+
       this.setState({items : games, completed : true})
        this.props.mainActions.setAllGames({key:rubricId, games : games})
-      // console.log(games)
+      console.log(games)
 
     })
     .catch((e)=>{console.log("Error while getting games")})

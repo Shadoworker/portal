@@ -61,6 +61,8 @@ State> {
         else g.attributes.tags = g.attributes.tags.split(",")
       });
 
+      games = games.filter(e=>e.attributes.published != false);
+
       this.setState({items : games, completed : true})
        this.props.mainActions.setAllGames({key:rubricId, games : games})
       // console.log(games)
@@ -90,7 +92,7 @@ State> {
     const { router } = this.props;
 
     this.props.mainActions.setGame(_game);
-localStorage.setItem("game", JSON.stringify(_game))
+    localStorage.setItem("game", JSON.stringify(_game))
     router.push({pathname:"/gamedetail"})
     
   }

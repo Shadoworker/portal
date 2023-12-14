@@ -32,12 +32,12 @@ class BottomTabNav extends Component<{}, State> {
             </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-                <Nav.Link className='kayfo-bottom-nav-link' eventKey="link-1">
+                <Nav.Link className='kayfo-bottom-nav-link' eventKey="link-1" href='/'>
                     <Image src={require("../assets/icons/search-icon.png")} alt="" />
                     Recherche</Nav.Link>
             </Nav.Item>
             <Nav.Item>
-                <Nav.Link className='kayfo-bottom-nav-link' eventKey="link-2">
+                <Nav.Link className='kayfo-bottom-nav-link' eventKey="link-2" href='/'>
                     <Image src={require("../assets/icons/favs-icon.png")} alt="" />
                     Mes Jeux</Nav.Link>
             </Nav.Item>
