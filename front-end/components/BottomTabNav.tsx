@@ -26,7 +26,7 @@ class BottomTabNav extends Component<{}, State> {
         <Navbar expand="lg" fixed='bottom' className="bg-body-tertiary  kayfo-bottom-nav">
         <Nav fill variant="tabs" className=' kayfo-bottom-nav' defaultActiveKey="#" style={{display:'flex', flex:1, flexDirection:'row'}}>
             <Nav.Item >
-                <Nav.Link className='kayfo-bottom-nav-link' href="#" >
+                <Nav.Link className='kayfo-bottom-nav-link' href="/" >
                     <Image src={require("../assets/icons/home-icon.png")} alt="" />
                     Accueil        
             </Nav.Link>

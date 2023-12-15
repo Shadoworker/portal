@@ -63,6 +63,7 @@ State> {
       });
 
       games = games.filter(e=>e.attributes.published != false);
+      games = games.sort((a,b)=>b.attributes.priority - a.attributes.priority);
 
       this.setState({items : games, completed:true})
        this.props.mainActions.setAllGames({key:rubricId, games : games})
@@ -82,11 +83,31 @@ State> {
     const { router } = this.props;
 
     this.props.mainActions.setGame(_game);
-localStorage.setItem("game", JSON.stringify(_game))
+    localStorage.setItem("game", JSON.stringify(_game))
     router.push({pathname:"/gamedetail"})
     
+    this.createStat("viewed", _game.id)
+
   }
  
+  createStat(_type, _gameId){
+
+    var stat = 
+      {data:{
+        type: _type,
+        game : _gameId
+      }}
+
+    contentService.createStat(stat)
+    .then(d=>{
+      console.log("Created stat")
+    })
+    .catch(e=>{
+      console.log(e)
+    })
+
+  }
+
    render(): React.ReactNode {
      return(
         <Container>

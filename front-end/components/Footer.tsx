@@ -24,7 +24,7 @@ class Footer extends Component<{}, State> {
             <Col>
                 <Row style={{display:'flex', flexDirection:'row'}}>
                     <Col>
-                      <Image src={require("../assets/icons/kayfo-logo.png")} className='kayfo-logo-footer' alt="Kayfo"  />
+                      <Image src={require("../assets/icons/kayfo-logo.png")} className='kayfo-logo-footer' width={150} alt="Kayfo"  />
                     </Col>
                     <Col style={{display:'flex', alignItems:'center', justifyContent:'flex-end'}}>
                         <Row>

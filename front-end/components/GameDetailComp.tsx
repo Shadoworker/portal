@@ -46,12 +46,33 @@ State> {
 
     this.setState({cardWidth})
 
+    setTimeout(() => {
+      window?.scrollTo(0,0);
+    }, 500);
+
+  }
+
+  createStat(_type, _gameId){
+
+    var stat = 
+      {data:{
+        type: _type,
+        game : _gameId
+      }}
+
+    contentService.createStat(stat)
+    .then(d=>{
+      console.log("Created stat")
+    })
+    .catch(e=>{
+      console.log(e)
+    })
+
   }
 
 
- componentDidUpdate(prevProps: any, prevState: Readonly<State>, snapshot?: any): void {
+  componentDidUpdate(prevProps: any, prevState: Readonly<State>, snapshot?: any): void {
   
-  // window.scrollTo(0,0);
    
  }
    
@@ -70,15 +91,15 @@ State> {
                 {this.state.item &&
                   <Card className='kayfo-game-detail-container'>
                   <div style={{position:'relative'}}>
-                    <Image  src={baseUrl + this.state.item?.attributes?.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth || 600} height={380} style={{objectFit:'cover', width:'100%', minHeight:250}} alt='' />
-                    <Button href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn'>Jouer maintenant</Button>
+                    <img  src={baseUrl + this.state.item?.attributes?.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth || 600} style={{objectFit:'cover', width:'100%', minHeight:250}} alt='' />
+                    <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>
                   </div>
                   <Card.Body>
                     <Card.Title>
                       <Row>
                         <Col xs={8} style={{fontWeight:'bolder'}} >{this.state.item?.attributes?.title} - {this.state.item?.attributes?.developer}</Col>
                         <Col xs={4} style={{display:'flex', justifyContent:'flex-end'}}>
-                          <Image className='kayfo-addfav' src={require("../assets/icons/add-to-favs-icon.png")} alt="" />
+                          {/* <Image className='kayfo-addfav' src={require("../assets/icons/add-to-favs-icon.png")} alt="" /> */}
                         </Col>
                       </Row>
                     </Card.Title>
@@ -106,7 +127,7 @@ State> {
                     </Col>
 
                     <Col style={{display:'flex', alignItems:'center', justifyContent:'center', marginTop:20}}>
-                        <Button variant="default kayfo-progress-btn" size='lg'>Suivre votre progression</Button>
+                        {/* <Button variant="default kayfo-progress-btn" size='lg'>Suivre votre progression</Button> */}
                     </Col>
 
                   </Card.Body>

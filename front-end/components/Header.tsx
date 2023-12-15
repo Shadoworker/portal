@@ -30,10 +30,10 @@ class Header extends Component<{}, State> {
       <Navbar expand="lg" className="bg-body-tertiary kayfo-header">
       <Container fluid>
         <Navbar.Brand href="/">
-          <Image src={require("../assets/icons/kayfo-logo.png")} className='kayfo-logo' alt="Kayfo"  />
+          <Image src={require("../assets/icons/kayfo-logo.png")} className='kayfo-logo' width={150} alt="Kayfo"  />
         </Navbar.Brand>
     
-        <Button variant="default kayfo-connexion-btn" size='lg'>Connexion</Button>
+       {/*  <Button variant="default kayfo-connexion-btn" size='lg'>Connexion</Button> */}
 
       </Container>
     </Navbar>

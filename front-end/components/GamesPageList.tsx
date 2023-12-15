@@ -21,7 +21,8 @@ interface Props {
 interface State {
 
   index : number,
-  items : any[]
+  items : any[],
+  completed : boolean,
 }
 
 const pattern = [[2,1],[2,2],[1,1],[1,1],[1,1],[1,1],[2,1],[1,1],[1,1]]
@@ -34,7 +35,8 @@ State> {
     super(props);
     this.state = {
       index : 0,
-      items : []
+      items : [],
+      completed : false,
     };
   }
 
@@ -63,8 +65,9 @@ State> {
       });
 
       games = games.filter(e=>e.attributes.published != false);
+      games = games.sort((a,b)=>b.attributes.priority - a.attributes.priority);
 
-      this.setState({items : games})
+      this.setState({items : games, completed:true})
       // this.props.mainActions.setAllGames({key:rubricId, games : games})
       // console.log(games)
 
@@ -112,9 +115,29 @@ State> {
     const { router } = this.props;
 
     this.props.mainActions.setGame(_game);
-localStorage.setItem("game", JSON.stringify(_game))
-    router.push({pathname:"/gamedetail"})
+    localStorage.setItem("game", JSON.stringify(_game))
+
+    router.reload()
     
+    this.createStat("viewed", _game.id)
+  }
+
+  createStat(_type, _gameId){
+
+    var stat = 
+      {data:{
+        type: _type,
+        game : _gameId
+      }}
+
+    contentService.createStat(stat)
+    .then(d=>{
+      console.log("Created stat")
+    })
+    .catch(e=>{
+      console.log(e)
+    })
+
   }
  
    render(): React.ReactNode {
@@ -128,7 +151,7 @@ localStorage.setItem("game", JSON.stringify(_game))
              <Col className='kayfo-gameslist-masonry' style={{}}>
 
               <div className="grid" >
-                {this.state.items.map((item, index)=>{
+                {this.state.items.filter(item => item.attributes.tags.includes(this.props.mainState.filterTag)).map((item, index)=>{
 
                   const width2 = item.pattern[0] == 2 ? "grid-item--width2" : "";
                   const height2 =item.pattern[1] === 2 ? "grid-item--height2" : "";
@@ -142,6 +165,12 @@ localStorage.setItem("game", JSON.stringify(_game))
 
                 })
 
+                }
+                
+                {this.state.items.filter(item => item.attributes.tags.includes(this.props.mainState.filterTag)).length == 0 &&
+                  <Col className='kayfo-filter-no-result-box'>
+                    {this.state.completed ? 'Aucun résultat' : 'Chargement...'}
+                  </Col>
                 }
                 
               </div>

@@ -5,6 +5,7 @@ const contentService = {
   getRubrics,
   getRubricGames,
 
+  createStat,
 
   getHeroes,
   getBanners,
@@ -107,6 +108,18 @@ function getPreferredSizes(userId:number) {
   let filter = `?filters[user][id][$eq]=${userId}`;
   return api.getData(resource + "/preferred-sizes"+filter+"&populate=size");
 }
+
+
+/**
+ * createState method
+ *
+ * @param {Object} payload
+ * @returns
+ */
+function createStat(payload) {
+  return api.postData(resource + "/stats", payload);
+}
+
 
 
 export default contentService;
