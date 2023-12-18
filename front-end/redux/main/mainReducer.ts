@@ -6,7 +6,7 @@ interface MainState {
   }
   
   const initialState: MainState = {
-    filterTag: "",
+    filterTag: "All",
     rubrics : [],
     allGames : {},
     game : {}

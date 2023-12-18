@@ -2,7 +2,7 @@ var filterCatgories = [
 
     {
         name:"Toutes",
-        tag : "",
+        tag : "All",
         link:""
     },
     {

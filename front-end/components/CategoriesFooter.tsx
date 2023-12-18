@@ -1,7 +1,9 @@
 import React, { Component, useState } from 'react';
 import { Container, Row, Col, ListGroup, Button } from 'react-bootstrap';
 import filterCatgories from '../services/mocks/filterCategories';
-
+import { connect } from 'react-redux';
+import { bindActionCreators} from 'redux';
+import * as mainActions from '../redux/main/mainActions'
 
 interface State {
    index : number,
@@ -9,7 +11,7 @@ interface State {
 }
 
 
-class CategoriesFooter extends Component<{}, State> {
+class CategoriesFooter extends Component<any, State> {
 
   constructor(props: {}) {
     super(props);
@@ -20,6 +22,13 @@ class CategoriesFooter extends Component<{}, State> {
   }
 
  
+  setFilterTag = (_tag:string) =>{
+
+    this.props.mainActions.setFilterTag(_tag);
+
+  }
+ 
+
    render(): React.ReactNode {
      return(
 
@@ -35,7 +44,7 @@ class CategoriesFooter extends Component<{}, State> {
                 {this.state.categories.map((item, index)=>
                 
                   <div key={index} style={{marginBottom:20, marginRight:10}}>
-                      <Button variant="outline-primary kayfo-category-btn">{item.name}</Button>
+                      <Button variant="outline-primary" className={`kayfo-category-btn ${item.tag == this.props.filterTag ? "active":""}`} onClick={()=>this.setFilterTag(item.tag)}>{item.name}</Button>
                   </div>
                   )}
 
@@ -48,5 +57,18 @@ class CategoriesFooter extends Component<{}, State> {
     )
   };
 };
+ 
+const mapStateToProps = (state:any) => {
+  return {
+    mainState: state.mainReducer
+  };
+};
 
-export default CategoriesFooter;
+const mapDispatchToProps = (dispatch:any) => {
+  return {
+    mainActions: bindActionCreators(mainActions, dispatch)
+  };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)( CategoriesFooter);

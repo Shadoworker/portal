@@ -36,7 +36,7 @@ State> {
   componentDidMount(): void {
  
     var game = JSON.parse(localStorage.getItem("game") || '{}')
-     
+    
     this.setState({item : game})
     // localStorage.setItem("game", JSON.stringify(game))
 

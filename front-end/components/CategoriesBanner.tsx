@@ -4,6 +4,7 @@ import filterCatgories from '../services/mocks/filterCategories';
 import { connect } from 'react-redux';
 import { bindActionCreators} from 'redux';
 import * as mainActions from '../redux/main/mainActions'
+import { withRouter } from 'next/router';
 
 
 interface State {
@@ -25,6 +26,9 @@ class CategoriesBanner extends Component<any, State> {
   setFilterTag = (_tag:string) =>{
 
     this.props.mainActions.setFilterTag(_tag);
+
+    const { router } = this.props;
+    router.push({pathname:"/"})
 
   }
  
@@ -71,4 +75,4 @@ const mapDispatchToProps = (dispatch:any) => {
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)( CategoriesBanner);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(CategoriesBanner));

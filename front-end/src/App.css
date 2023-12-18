@@ -50,6 +50,44 @@ img
   transition: all ease-in .1s;
 }
 
+.kayfo-signin-btn
+{
+  background-color: var(--kayfo-pink);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  transition: all ease-in .2s;
+  padding-top: 4px;
+}
+
+.kayfo-signin-btn:hover
+{
+  color: #fff;
+  background-color: #0c0111;
+  transition: all ease-in .1s;
+}
+
+.kayfo-signin-box
+{
+  background-color: #ffffff15;
+  padding: 15px 15px 50px 15px;
+  border-radius: 8px;
+}
+
+.kayfo-signin-input
+{
+  color: #ffffff;
+}
+.kayfo-signin-input:focus
+{
+  color: #ffffff;
+}
+
+.kayfo-signin-input::placeholder
+{
+  color: #ffffff54;
+}
 
 .kayfo-categories-banner
 {
@@ -455,5 +493,10 @@ ul li.page-item.active span
   .kayfo-game-detail-img
   {
     max-height: 250px;
+  }
+
+  .kayfo-signin-box
+  {
+    background-color: transparent;
   }
 }

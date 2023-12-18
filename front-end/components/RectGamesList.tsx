@@ -58,8 +58,12 @@ State> {
       var games = d.data.attributes.games.data;
 
       games.forEach(g => {
-        if(g.attributes.tags == null) g.attributes.tags = [""];
+        if(g.attributes.tags == null) g.attributes.tags = [];
         else g.attributes.tags = g.attributes.tags.split(",")
+      });
+
+      games.forEach(g => {
+        if(!g.attributes.tags.includes("All")) g.attributes.tags.push("All")
       });
 
       games = games.filter(e=>e.attributes.published != false);
