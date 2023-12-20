@@ -23,7 +23,8 @@ class Header extends Component<any, any> {
     super(props);
     this.state = {
       index : 0,
-      user : null
+      user : null,
+      dev:false,
     };
   }
 
@@ -31,6 +32,10 @@ class Header extends Component<any, any> {
   componentDidMount(): void {
     
     var user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user") || "{}") : null;
+
+    const { router } = this.props;
+    if(router.asPath.includes("?dev")) this.setState({dev:true})
+
 
     this.setState({user})
 
@@ -66,8 +71,12 @@ class Header extends Component<any, any> {
           <Image src={require("../assets/icons/kayfo-logo.png")} className='kayfo-logo' width={150} alt="Kayfo"  />
         </Navbar.Brand>
 
-        {!this.props.hidebtn && !this.state.user &&
-          <Button variant="default kayfo-connexion-btn" size='lg' onClick={this.gotoLogin} >Connexion</Button>
+        {this.state.dev &&
+        <>
+          {!this.props.hidebtn && !this.state.user &&
+            <Button variant="default kayfo-connexion-btn" size='lg' onClick={this.gotoLogin} >Connexion</Button>
+          }
+        </>
         }
         
         {this.state.user &&

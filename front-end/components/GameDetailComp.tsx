@@ -19,7 +19,10 @@ interface State {
   index : number,
   item : any,
   cardWidth :any,
-  user : any
+  user : any,
+
+
+  dev :boolean,
 }
 
 
@@ -34,7 +37,8 @@ State> {
         index : 0,
         item : null,
         cardWidth : 600,
-        user : null
+        user : null,
+        dev : false
       };
     }
   
@@ -43,6 +47,9 @@ State> {
  
     var game = JSON.parse(localStorage.getItem("game") || '{}')
     var user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user") || "{}") : null;
+
+    const { router } = this.props;
+    if(router.asPath.includes("?dev")) this.setState({dev:true})
 
     this.setState({item : game, user : user})
     // localStorage.setItem("game", JSON.stringify(game))
@@ -103,8 +110,15 @@ State> {
                   <Card className='kayfo-game-detail-container'>
                   <div style={{position:'relative'}}>
                     <img  src={baseUrl + this.state.item?.attributes?.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth || 600} style={{objectFit:'cover', width:'100%', minHeight:250}} alt='' />
-                    {this.state.user && <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>}
-                    {!this.state.user && <Button onClick={()=>this.gotoLogin()} className='kayfo-playnow-btn' >Jouer maintenant</Button>}
+                    {this.state.dev &&
+                      <>
+                        {(this.state.user) && <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>}
+                        {(!this.state.user) && <Button onClick={()=>this.gotoLogin()} className='kayfo-playnow-btn' >Jouer maintenant</Button>}
+                      </>
+                    }
+                    {!this.state.dev &&
+                      <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>
+                    }
                   </div>
                   <Card.Body>
                     <Card.Title>
