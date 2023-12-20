@@ -1,12 +1,13 @@
 import React, { Component, useState } from 'react';
 import Header from '../components/Header';
-
+import { connect } from 'react-redux';
+import { bindActionCreators} from 'redux';
+import * as mainActions from '../redux/main/mainActions'
 import {withRouter } from 'next/router';
 import {Button, Col, Container, Dropdown, Form, Row, Spinner } from 'react-bootstrap';
 
 import countries from '../services/mocks/countries.json';
 import Image from 'next/image';
-import { url } from 'inspector';
 import userService from '../services/user.service';
 import { Alert, Snackbar } from '@mui/material';
 
@@ -86,14 +87,14 @@ any> {
         var user = d.user;
         this.setState({success : true})
 
-        setTimeout(() => {
-          
-          const { router } = this.props;
-
-          // this.props.mainActions.setUser(user);
-          router.push({pathname:"/"})
-
-        }, 1000);
+        var signinData = 
+        {
+          identifier : phone,
+          password : this.state.password,
+        }
+  
+        this.authUser(signinData)
+        
         console.log(user)
 
       })
@@ -111,31 +112,45 @@ any> {
         password : this.state.password,
       }
 
-      userService.authUser(signinData).then((d:any)=>{
-          
-        var user = d.user;
-        this.setState({success : true})
-
-        setTimeout(() => {
-          
-          const { router } = this.props;
-
-          // this.props.mainActions.setUser(user);
-          router.push({pathname:"/"})
-
-        }, 1000);
-        console.log(user)
-
-      })
-      .catch(e=>{
-        console.log(e)
-        this.setState({error : true})
-
-      })
+      this.authUser(signinData)
     }
 
-    
   }
+
+  authUser = (signinData : any)=>{
+
+    this.setState({navState : 'signin', processing : true})
+
+    userService.authUser(signinData).then((d:any)=>{
+          
+      var user = d.user;
+      this.setState({success : true})
+
+      setTimeout(() => {
+        
+        const { router } = this.props;
+
+        this.props.mainActions.setUser(user);
+        sessionStorage.setItem('user', JSON.stringify(user))
+        var to = this.props.mainState.pageOrigin ? this.props.mainState.pageOrigin : "/";
+
+        this.props.mainActions.setPageOrigin(null)
+
+        router.push({pathname:to})
+
+      }, 1000);
+      console.log(user)
+
+    })
+    .catch(e=>{
+      console.log(e)
+      this.setState({error : true})
+
+    })
+
+  }
+
+ 
 
    render(): React.ReactNode {
      return(
@@ -273,4 +288,19 @@ any> {
   };
 };
 
-export default withRouter(LoginPage);
+
+
+const mapStateToProps = (state:any) => {
+  return {
+    mainState: state.mainReducer
+  };
+};
+
+const mapDispatchToProps = (dispatch:any) => {
+  return {
+    mainActions: bindActionCreators(mainActions, dispatch)
+  };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(LoginPage));

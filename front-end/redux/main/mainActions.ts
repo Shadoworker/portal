@@ -30,6 +30,21 @@ export const setGame = (_payload:any): any => {
 };
 
 
+export const setUser = (_payload:any): any => {
+  return {
+    type: MainActionTypes.SET_USER,
+    payload : _payload
+  };
+};
+
+export const setPageOrigin = (_payload:any): any => {
+  return {
+    type: MainActionTypes.SET_PAGE_ORIGIN,
+    payload : _payload
+  };
+};
+
+
 
 
  

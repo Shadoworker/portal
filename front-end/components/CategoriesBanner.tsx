@@ -39,7 +39,7 @@ class CategoriesBanner extends Component<any, State> {
                 {this.state.categories.map((item, index)=>
                 
                     <ListGroup.Item key={index}>
-                        <Button variant="outline-primary" className={`kayfo-category-btn ${item.tag == this.props.filterTag ? "active":""}`} onClick={()=>this.setFilterTag(item.tag)}>{item.name}</Button>
+                        <Button variant="outline-primary" className={`kayfo-category-btn ${item.tag == this.props.mainState.filterTag ? "active":""}`} onClick={()=>this.setFilterTag(item.tag)}>{item.name}</Button>
                     </ListGroup.Item>
                 )
                     

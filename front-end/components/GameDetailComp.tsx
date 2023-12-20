@@ -4,6 +4,10 @@ import gameslistGames from '../services/mocks/gameslistGames';
 import Image from 'next/image';
 import { baseUrl } from '../services/apiUrl';
 import contentService from '../services/content.service';
+import { withRouter } from 'next/router';
+import { connect } from 'react-redux';
+import { bindActionCreators} from 'redux';
+import * as mainActions from '../redux/main/mainActions'
 
 interface Props {
 
@@ -14,7 +18,8 @@ interface State {
 
   index : number,
   item : any,
-  cardWidth :any
+  cardWidth :any,
+  user : any
 }
 
 
@@ -28,7 +33,8 @@ State> {
       this.state = {
         index : 0,
         item : null,
-        cardWidth : 600
+        cardWidth : 600,
+        user : null
       };
     }
   
@@ -36,8 +42,9 @@ State> {
   componentDidMount(): void {
  
     var game = JSON.parse(localStorage.getItem("game") || '{}')
-    
-    this.setState({item : game})
+    var user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user") || "{}") : null;
+
+    this.setState({item : game, user : user})
     // localStorage.setItem("game", JSON.stringify(game))
 
     var card = document.querySelector('.kayfo-game-detail-container');
@@ -70,16 +77,20 @@ State> {
 
   }
 
-
-  componentDidUpdate(prevProps: any, prevState: Readonly<State>, snapshot?: any): void {
-  
-   
- }
+ 
    
   goplayGame = (_game:any)=>{
     // const navigate = useNavigate();
     // this.props.navigate("/gamedetail", {state : {game : _game}})
     
+  }
+
+  gotoLogin = ()=>{
+    const { router } = this.props;
+
+    this.props.mainActions.setPageOrigin("/gamedetail")
+
+    router.push({pathname:"/login"})
   }
 
  
@@ -92,7 +103,8 @@ State> {
                   <Card className='kayfo-game-detail-container'>
                   <div style={{position:'relative'}}>
                     <img  src={baseUrl + this.state.item?.attributes?.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth || 600} style={{objectFit:'cover', width:'100%', minHeight:250}} alt='' />
-                    <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>
+                    {this.state.user && <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>}
+                    {!this.state.user && <Button onClick={()=>this.gotoLogin()} className='kayfo-playnow-btn' >Jouer maintenant</Button>}
                   </div>
                   <Card.Body>
                     <Card.Title>
@@ -148,6 +160,19 @@ State> {
         </Container>
     )
   };
+}; 
+
+const mapStateToProps = (state:any) => {
+  return {
+    mainState: state.mainReducer
+  };
 };
 
-export default GamesDetailComp;
+const mapDispatchToProps = (dispatch:any) => {
+  return {
+    mainActions: bindActionCreators(mainActions, dispatch)
+  };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(GamesDetailComp));

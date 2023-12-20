@@ -107,6 +107,8 @@ class HomePage extends Component<any, State> {
             </div>
            
             <BottomTabNav />
+
+          
         </div>
     )
   };

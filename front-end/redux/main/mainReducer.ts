@@ -3,13 +3,17 @@ interface MainState {
     rubrics:any[];
     allGames : object;
     game:any;
+    user:any;
+    pageOrigin : any;
   }
   
   const initialState: MainState = {
     filterTag: "All",
     rubrics : [],
     allGames : {},
-    game : {}
+    game : {},
+    user : null,
+    pageOrigin : null
   };
   
   export enum MainActionTypes {
@@ -17,6 +21,8 @@ interface MainState {
     SET_RUBRICS = "SET_RUBRICS",
     SET_ALL_GAMES = "SET_ALL_GAMES",
     SET_GAME = "SET_GAME",
+    SET_USER = "SET_USER",
+    SET_PAGE_ORIGIN = "SET_PAGE_ORIGIN",
   }
 
   
@@ -41,7 +47,15 @@ interface MainState {
           
       case MainActionTypes.SET_GAME:
         return { ...state, game: action.payload };
+    
+        
+      case MainActionTypes.SET_USER:
+        return { ...state, user: action.payload };
       
+      case MainActionTypes.SET_PAGE_ORIGIN:
+        return { ...state, pageOrigin: action.payload };
+      
+
       default:
         return state;
     }

@@ -1,32 +1,61 @@
+import { Avatar } from '@mui/material';
+import { deepOrange } from '@mui/material/colors';
 import Image from 'next/image';
 import { withRouter } from 'next/router';
 import React, { Component, useState } from 'react';
-
+import { Dropdown } from 'react-bootstrap';
+import { connect } from 'react-redux';
+import { bindActionCreators} from 'redux';
+import * as mainActions from '../redux/main/mainActions'
 
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import userService from '../services/user.service';
 
+ 
 
-interface State {
-   index : number
-}
-
-
-class Header extends Component<any, State> {
+class Header extends Component<any, any> {
 
   constructor(props: any) {
     super(props);
     this.state = {
-      index : 0
+      index : 0,
+      user : null
     };
+  }
+
+
+  componentDidMount(): void {
+    
+    var user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user") || "{}") : null;
+
+    this.setState({user})
+
   }
 
   gotoLogin = ()=>{
     const { router } = this.props;
     router.push({pathname:"/login"})
+  }
+
+
+  logout = ()=>{
+
+    var user = null;
+
+    setTimeout(() => {
+      
+      const { router } = this.props;
+
+      this.props.mainActions.setUser(user);
+      sessionStorage.removeItem("user")
+      router.reload()
+
+    }, 50);
+
   }
  
    render(): React.ReactNode {
@@ -37,8 +66,22 @@ class Header extends Component<any, State> {
           <Image src={require("../assets/icons/kayfo-logo.png")} className='kayfo-logo' width={150} alt="Kayfo"  />
         </Navbar.Brand>
 
-        {!this.props.hidebtn &&
+        {!this.props.hidebtn && !this.state.user &&
           <Button variant="default kayfo-connexion-btn" size='lg' onClick={this.gotoLogin} >Connexion</Button>
+        }
+        
+        {this.state.user &&
+          <Dropdown drop={"start"}>
+          <Dropdown.Toggle variant="default" style={{color:'#fff', border:'none'}} id="dropdown-basic">
+            <Avatar style={{position:'absolute', top:0, left:-5}} sx={{ bgcolor: deepOrange[500] }}>{this.state.user?.name ? this.state.user?.name[0] : null }</Avatar>
+          </Dropdown.Toggle>
+          <Dropdown.Menu >
+            <Dropdown.Item onClick={()=>this.logout()}>
+              Déconnexion
+            </Dropdown.Item>
+            
+          </Dropdown.Menu>
+        </Dropdown>
         }
         {this.props.hidebtn &&
           <Form.Select style={{width:'auto', backgroundColor:'transparent', color:"#fff", borderRadius:25, padding:'5px 35px 5px 15px'}} aria-label="">
@@ -55,4 +98,19 @@ class Header extends Component<any, State> {
 
 }
 
-export default withRouter(Header);
+
+
+const mapStateToProps = (state:any) => {
+  return {
+    mainState: state.mainReducer
+  };
+};
+
+const mapDispatchToProps = (dispatch:any) => {
+  return {
+    mainActions: bindActionCreators(mainActions, dispatch)
+  };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Header));

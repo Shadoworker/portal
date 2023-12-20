@@ -73,7 +73,6 @@ State> {
 
       this.setState({items : games, completed : true})
        this.props.mainActions.setAllGames({key:rubricId, games : games})
-      console.log(games)
 
     })
     .catch((e)=>{console.log("Error while getting games")})

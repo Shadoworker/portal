@@ -154,6 +154,12 @@ img
   border-color: var(--kayfo-pink);
 }
 
+.kayfo-category-btn .active
+{
+  background-color: var(--kayfo-pink);
+  border-color: var(--kayfo-pink);
+}
+
 .kayfo-category-btn.active
 {
   background-color: var(--kayfo-pink);
