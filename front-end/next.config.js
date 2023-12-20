@@ -2,7 +2,7 @@
 const nextConfig = {
     reactStrictMode: true,
     images: {
-        domains: ['strapi-test-1-staging.eu-central-1.elasticbeanstalk.com'],
+        domains: ['strapi-test-1-staging.eu-central-1.elasticbeanstalk.com', "https://country-code-au6g.vercel.app"],
     },
 }
 

@@ -38,16 +38,13 @@ class Header extends Component<any, State> {
         </Navbar.Brand>
 
         {!this.props.hidebtn &&
-        <></>
-          // <Button variant="default kayfo-connexion-btn" size='lg' onClick={this.gotoLogin} >Connexion</Button>
+          <Button variant="default kayfo-connexion-btn" size='lg' onClick={this.gotoLogin} >Connexion</Button>
         }
         {this.props.hidebtn &&
-        <></>
-        
-        // <Form.Select style={{width:'auto', backgroundColor:'transparent', color:"#fff", borderRadius:25, padding:'5px 35px 5px 15px'}} aria-label="">
-        //   <option value="1" style={{backgroundColor:"transparent", color:"#000"}}>Français</option>
-        //   <option value="2" style={{backgroundColor:"transparent", color:"#000"}}>English</option>
-        // </Form.Select>
+          <Form.Select style={{width:'auto', backgroundColor:'transparent', color:"#fff", borderRadius:25, padding:'5px 35px 5px 15px'}} aria-label="">
+            <option value="1" style={{backgroundColor:"transparent", color:"#000"}}>Français</option>
+            <option value="2" style={{backgroundColor:"transparent", color:"#000"}}>English</option>
+          </Form.Select>
         }
 
       </Container>

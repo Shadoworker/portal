@@ -15,7 +15,7 @@ COPY package.json package-lock.json ./
 
 RUN npm install --production
 
-RUN npm install --arch=arm64 --platform=linuxmusl sharp
+# RUN npm install --arch=arm64 --platform=linuxmusl sharp
 
 WORKDIR /app
 
