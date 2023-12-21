@@ -78,13 +78,13 @@ class Header extends Component<any, any> {
           <Image src={require("../assets/icons/kayfo-logo.png")} className='kayfo-logo' width={150} alt="Kayfo"  />
         </Navbar.Brand>
 
-        {this.state.dev &&
+        {/* {this.state.dev && */}
         <>
           {!this.props.hidebtn && !this.state.user &&
             <Button variant="default kayfo-connexion-btn" size='lg' onClick={this.gotoLogin} >Connexion</Button>
           }
         </>
-        }
+        {/* } */}
         
         {this.state.user &&
           <Dropdown drop={"start"}>
