@@ -10,6 +10,7 @@ import countries from '../services/mocks/countries.json';
 import Image from 'next/image';
 import userService from '../services/user.service';
 import { Alert, Snackbar } from '@mui/material';
+import accountErrors from '../services/mocks/accountErrors';
 
 interface Props {
 
@@ -27,9 +28,10 @@ any> {
     this.state = {
       index : 0,
       navState : "signin",
-      countries : countries.sort((a, b) => parseInt(a.dial_code) - parseInt(b.dial_code)),
+      countries : countries, //.sort((a, b) => parseInt(a.dial_code) - parseInt(b.dial_code)),
       processing:false,
       error:false,
+      errorMessage:"Une erreur s'est produite lors de l'opération",
       success : false,
       dialCode : "+221",
       flag : "SN.svg",
@@ -43,7 +45,24 @@ any> {
 
 
   componentDidMount(): void {
+
+    this.getUserCountry()
     
+  }
+
+  getUserCountry = async () => {
+    try {
+      const response = await fetch("https://ipapi.co/json");
+      const data = await response.json();
+      var countryName = data.country_name;
+
+      var country = countries.find(c=>c.name == countryName) || countries.find(c=>c.name == "Senegal") // senegal by default
+
+      this.setState({dialCode : country?.dial_code, flag : country?.image})
+
+    } catch (error) {
+      console.log(error);
+    }
   }
  
   switchNavstate = (state:string)=>{
@@ -143,8 +162,25 @@ any> {
 
     })
     .catch(e=>{
-      console.log(e)
-      this.setState({error : true})
+
+      var errorMessage = e.response.data.error.message;
+
+      switch (errorMessage) {
+        case accountErrors.noExistingAccount:
+          setTimeout(() => {
+            this.setState({
+              username : "",
+              password: "",
+              error: false,
+              processing:false, 
+              navState : 'signup'
+            })
+          }, 10);
+          break;
+       
+      }
+
+      this.setState({error : true, errorMessage : errorMessage})
 
     })
 
@@ -175,9 +211,10 @@ any> {
                           </Dropdown.Toggle>
                           <Dropdown.Menu style={{maxHeight:200, overflowY:'scroll'}}>
                             {countries.map((c:any,i:number)=>{
-                              return  <Dropdown.Item onClick={()=>{this.setState({dialCode:c.dial_code, flag:c.image})}}>
+                              return  <Dropdown.Item key={i} onClick={()=>{this.setState({dialCode:c.dial_code, flag:c.image})}}>
                                   <Image src={`https://country-code-au6g.vercel.app/${c.image}`} width={20} height={20}  alt="flag"  />
                                    <span>{c.dial_code}</span>
+                                   <span> - {c.name}</span>
                                 </Dropdown.Item>
                             })
                             }
@@ -253,13 +290,13 @@ any> {
                       <div style={{position:'relative', display:'flex', flexDirection:'column', alignItems:'center'}}>
                         {this.state.navState == "signup" &&
                             <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-                              <span>Une erreur s'est produite lors de la création du compte </span>
+                              <span>{this.state.errorMessage}</span>
                               <a href="" style={{color:"#FF7A00"}} >reprendre</a>
                             </div>
                         }
                         {this.state.navState == "signin" &&
                             <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-                              <span>Une erreur s'est produite lors de la connexion </span>
+                              <span>{this.state.errorMessage}</span>
                               <a href="" style={{color:"#FF7A00"}} >reprendre</a>
                             </div>
                         }

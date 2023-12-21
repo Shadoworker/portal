@@ -46,6 +46,12 @@ class Header extends Component<any, any> {
     router.push({pathname:"/login"})
   }
 
+  
+  myaccount = ()=>{
+ 
+    const { router } = this.props;
+    router.push({pathname:"/account"})
+  }
 
   logout = ()=>{
 
@@ -62,6 +68,7 @@ class Header extends Component<any, any> {
     }, 50);
 
   }
+
  
    render(): React.ReactNode {
      return(
@@ -85,6 +92,9 @@ class Header extends Component<any, any> {
             <Avatar style={{position:'absolute', top:0, left:-5}} sx={{ bgcolor: deepOrange[500] }}>{this.state.user?.name ? this.state.user?.name[0] : null }</Avatar>
           </Dropdown.Toggle>
           <Dropdown.Menu >
+            <Dropdown.Item onClick={()=>this.myaccount()}>
+              Mon compte
+            </Dropdown.Item>
             <Dropdown.Item onClick={()=>this.logout()}>
               Déconnexion
             </Dropdown.Item>

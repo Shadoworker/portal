@@ -8,6 +8,8 @@ import { withRouter } from 'next/router';
 import { connect } from 'react-redux';
 import { bindActionCreators} from 'redux';
 import * as mainActions from '../redux/main/mainActions'
+import userService from '../services/user.service';
+import { Alert, Snackbar } from '@mui/material';
 
 interface Props {
 
@@ -20,7 +22,7 @@ interface State {
   item : any,
   cardWidth :any,
   user : any,
-
+  success : boolean,
 
   dev :boolean,
 }
@@ -38,6 +40,7 @@ State> {
         item : null,
         cardWidth : 600,
         user : null,
+        success : false,
         dev : false
       };
     }
@@ -64,7 +67,33 @@ State> {
       window?.scrollTo(0,0);
     }, 500);
 
+
+    // Request user updates
+    if(user)
+    {
+      this.getUser(user.id);
+    }
+
   }
+
+  getUser(id){
+
+    userService.getUser(id)
+    .then(d=>{
+
+      var user = d;
+      this.props.mainActions.setUser(user);
+      sessionStorage.setItem('user', JSON.stringify(user))
+      this.setState({user : user})
+
+    })
+    .catch(e=>{
+      console.log(e)
+    })
+
+  }
+
+
 
   createStat(_type, _gameId){
 
@@ -77,6 +106,32 @@ State> {
     contentService.createStat(stat)
     .then(d=>{
       console.log("Created stat")
+    })
+    .catch(e=>{
+      console.log(e)
+    })
+
+  }
+
+
+  requestAccess(){
+
+    var data = 
+      {
+        access: "REQUESTED",
+      }
+
+    userService.updateUser(this.state.user.id, data)
+    .then(d=>{
+      console.log("Access requested")
+      
+      var user = {...this.state.user};
+
+      user.access = "REQUESTED";
+      this.props.mainActions.setUser(user);
+      sessionStorage.setItem('user', JSON.stringify(user))
+      
+      this.setState({success : true, user : user})
     })
     .catch(e=>{
       console.log(e)
@@ -110,15 +165,16 @@ State> {
                   <Card className='kayfo-game-detail-container'>
                   <div style={{position:'relative'}}>
                     <img  src={baseUrl + this.state.item?.attributes?.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth || 600} style={{objectFit:'cover', width:'100%', minHeight:250}} alt='' />
-                    {this.state.dev &&
+                    {/* {this.state.dev && */}
                       <>
-                        {(this.state.user) && <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>}
+                        {(this.state.user && this.state.user.access == "GRANTED") && <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>}
+                        {(this.state.user && this.state.user.access != "GRANTED") && <Button onClick={()=>{this.state.user.access != "REQUESTED" ? this.requestAccess() : null}} disabled={this.state.user.access == "REQUESTED"} className='kayfo-playnow-btn' >{this.state.user.access != "REQUESTED" ? 'Demander un accés test' : "Demande d'accés envoyée"}</Button>}
                         {(!this.state.user) && <Button onClick={()=>this.gotoLogin()} className='kayfo-playnow-btn' >Jouer maintenant</Button>}
                       </>
-                    }
-                    {!this.state.dev &&
+                    {/* } */}
+                    {/* {!this.state.dev &&
                       <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>
-                    }
+                    } */}
                   </div>
                   <Card.Body>
                     <Card.Title>
@@ -160,7 +216,14 @@ State> {
                 </Card>
                 }
               </Col>
-             
+              
+              {this.state.success &&
+                <Snackbar open={true}  anchorOrigin={{ vertical:'top', horizontal:"center" }} autoHideDuration={5000}>
+                  <Alert severity="success" sx={{ width: 200 }}>
+                    Demande envoyée avec succés !
+                  </Alert>
+                </Snackbar>
+              }
               {/* <Carousel>
                 <Carousel.Item>
                   <Image style={{width:'100%', maxHeight:300 ,objectFit:'cover'}} src={this.props.game.media} alt="" />

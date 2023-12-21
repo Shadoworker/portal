@@ -5,6 +5,7 @@ const userService = {
  
   createUser,
   authUser,
+  updateUser,
   getUser,
  
 };
@@ -32,6 +33,18 @@ function createUser(payload) {
  */
 function authUser(payload) {
   return api.postData(resource + "/auth/local", payload);
+}
+
+
+/**
+ * updateUser method
+ *
+ * @param {number} id
+ * @param {Object} payload
+ * @returns
+ */
+function updateUser(id, payload) {
+  return api.putData(resource + "/users/"+id, payload);
 }
 
 

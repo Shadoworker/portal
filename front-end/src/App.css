@@ -441,6 +441,12 @@ ul li.page-item.active span
   background-color: var(--kayfo-violet);
 }
 
+.kayfo-playnow-btn:disabled
+{
+  background-color: gray;
+  border-color: var(--kayfo-orange);
+}
+
 .kayfo-addfav
 {
   padding: 10px;
