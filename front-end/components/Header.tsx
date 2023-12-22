@@ -31,7 +31,7 @@ class Header extends Component<any, any> {
 
   componentDidMount(): void {
     
-    var user = sessionStorage.getItem("user") ? JSON.parse(sessionStorage.getItem("user") || "{}") : null;
+    var user = (sessionStorage.getItem("user") && sessionStorage.getItem("user") != 'undefined') ? JSON.parse(sessionStorage.getItem("user") || "{}") : null;
 
     const { router } = this.props;
     if(router.asPath.includes("?dev")) this.setState({dev:true})
@@ -63,7 +63,9 @@ class Header extends Component<any, any> {
 
       this.props.mainActions.setUser(user);
       sessionStorage.removeItem("user")
-      router.reload()
+      // router.reload()
+      router.push({pathname:"/"})
+
 
     }, 50);
 
@@ -89,7 +91,7 @@ class Header extends Component<any, any> {
         {this.state.user &&
           <Dropdown drop={"start"}>
           <Dropdown.Toggle variant="default" style={{color:'#fff', border:'none'}} id="dropdown-basic">
-            <Avatar style={{position:'absolute', top:0, left:-5}} sx={{ bgcolor: deepOrange[500] }}>{this.state.user?.name ? this.state.user?.name[0] : null }</Avatar>
+            <span style={{position:'absolute', right:'150%'}}>{this.state.user.name}</span><Avatar style={{position:'absolute', top:0, left:-5}} sx={{ bgcolor: deepOrange[500] }}>{/* this.state.user?.name ? this.state.user?.name[0] : */ null }</Avatar>
           </Dropdown.Toggle>
           <Dropdown.Menu >
             <Dropdown.Item onClick={()=>this.myaccount()}>

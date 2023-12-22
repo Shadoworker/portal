@@ -7,7 +7,8 @@ const userService = {
   authUser,
   updateUser,
   getUser,
- 
+  getUserByMail,
+  getUserByToken
 };
 
 const resource = "";
@@ -57,6 +58,31 @@ function updateUser(id, payload) {
 function getUser(id) {
   return api.getData(resource + "/users/"+id);
 }
+
+
+/**
+ * getUser method
+ *
+ * @param {string} mail
+ * @returns
+ */
+function getUserByMail(mail) {
+  let filter = `?filters[email][$eq]=${mail}`;
+  return api.getData(resource + "/users"+filter);
+}
+
+/**
+ * getUser method
+ *
+ * @param {string} token
+ * @returns
+ */
+function getUserByToken(token) {
+  let filter = `?filters[passwordResetToken][$eq]=${token}`;
+  return api.getData(resource + "/users"+filter);
+}
+
+ 
 
 
 

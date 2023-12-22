@@ -19,7 +19,7 @@ interface Props {
  
  
 
-class AccountPage extends Component<any,
+class ResetPasswordPage extends Component<any,
 any> {
 
   constructor(props:any)
@@ -41,6 +41,7 @@ any> {
       email:"",
       password:"",
       repassword:"",
+      token : null,
 
       user : null
     };
@@ -49,12 +50,13 @@ any> {
 
 
   componentDidMount(): void {
-    
-    var user = (sessionStorage.getItem("user") && sessionStorage.getItem("user") != 'undefined') ? JSON.parse(sessionStorage.getItem("user") || "{}") : null;
-  
-    var userEmail = user?.email == user?.username+"@kayfo-portal.games" ? "" : user?.email; // the default mail
+     
+    const urlParams = new URLSearchParams(window.location.search);
+    // Get specific parameters
+    const token = urlParams.get('token');
 
-    this.setState({user : user, name : user?.name, email:userEmail})
+    this.setState({token:token})
+
   }
  
   switchNavstate = (state:string)=>{
@@ -68,64 +70,63 @@ any> {
 
 
   submitForm = () =>{
+ 
+    if(!this.state.password || !this.state.password.trim().length) return;
 
-    if(!this.state.email.trim().length) return;
-    if(!this.state.name.trim().length) return;
-     
+    if(this.state.password != this.state.repassword) return;
+
     var updateData = 
     { 
-      email : this.state.email,
-      name :  this.state.name
+      password : this.state.password,
+      passwordResetToken : null
     }
         
-    this.updateUser(updateData)
-      
+    this.updatePassword(updateData)
 
+    console.log("rrr")
   }
 
-  updateUser = (updateData : any)=>{
+  updatePassword = (updateData : any)=>{
 
     this.setState({processing : true})
-    var userId = this.state.user.id;
 
-    userService.updateUser(userId, updateData).then((d:any)=>{
+    userService.getUserByToken(this.state.token).then((d:any)=>{
           
-      var user = this.state.user;
-      user.name = updateData.name;
-      user.email = updateData.email;
+      var users = d;
 
-      setTimeout(() => {
-        
-        this.setState({success : true, processing : false})
+      if(users.length > 0)
+      {
+        var user = users[0];
+
+        userService.updateUser(user.id, updateData).then((d:any)=>{
+            
+          this.setState({success : true})
+
+          const { router } = this.props;
           
-        this.props.mainActions.setUser(user);
-        sessionStorage.setItem('user', JSON.stringify(user))
-      }, 1000);
+          setTimeout(() => {
+            router.push({pathname:"/login"})
+          }, 1200);
     
-      
-      console.log(user)
+    
+        })
+        .catch(e=>{
+    
+          this.setState({error : true})
+    
+        })
+
+      }
+      else
+      {
+        this.setState({error : true})
+      }
+
 
     })
     .catch(e=>{
-
-      var errorMessage = e.response.data.error.message;
-
-      switch (errorMessage) {
-        case accountErrors.noExistingAccount:
-          // setTimeout(() => {
-          //   this.setState({
-          //     username : "",
-          //     password: "",
-          //     error: false,
-          //     processing:false, 
-          //     navState : 'signup'
-          //   })
-          // }, 10);
-          break;
-       
-      }
-
-      this.setState({error : true, errorMessage : errorMessage})
+ 
+      this.setState({error : true})
 
     })
 
@@ -140,32 +141,24 @@ any> {
             <Header hidebtn={true} />
             <div className='kayfo-body-content'>
 
-             <div className='kayfo-block-title' style={{textAlign:'center', marginTop:15, textTransform:'uppercase'}}><span>Mon compte</span></div>
+             <div className='kayfo-block-title' style={{textAlign:'center', marginTop:15, textTransform:'uppercase'}}><span>Mot de passe oublié</span></div>
 
               <Container>
                 <Row style={{justifyContent:'center', marginTop:15, color:'#fff'}}>
                   <Col lg="4" sm="8" xs="11" className='kayfo-signin-box'>
                     {!this.state.processing &&
                       <Form>
-                        
-                        <Form.Group className="mb-3" controlId="formBasicTel" style={{display:'flex'}}>
-                          <Form.Control required className='kayfo-signin-input' placeholder="tel" disabled value={this.state.user?.username} style={{border:'none', color:'gray', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
+                         
+                        <Form.Group className="mb-3" controlId="formBasicPassword">
+                          <Form.Control required className='kayfo-signin-input' onChange={(e)=>this.updateInput("password", e.target.value)} type="password" placeholder="Mot de passe*" style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
                         </Form.Group>
 
-                        <Form.Group className="mb-3" controlId="formBasicName" style={{display:'flex'}}>
-                          <Form.Control required className='kayfo-signin-input' placeholder="nom" defaultValue={this.state.name} onChange={(e)=>this.updateInput("name", e.target.value)} style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
+                        <Form.Group className="mb-3" controlId="formBasicPassword2">
+                            <Form.Control required className='kayfo-signin-input' onChange={(e)=>this.updateInput("repassword", e.target.value)} type="password" placeholder="Confirmer le mot de passe*" style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
                         </Form.Group>
+                          
 
-                        <Form.Group className="mb-3" controlId="formBasicMail" style={{display:'flex'}}>
-                          <Form.Control required pattern='/^[^\s@]+@[^\s@]+\.[^\s@]+$/' className='kayfo-signin-input' onChange={(e)=>this.updateInput("email", e.target.value)} defaultValue={this.state.email} type="email" placeholder="Email de recupération"  style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
-                        </Form.Group>
-
-                      {/* <Form.Group className="mb-3" controlId="formBasicPassword">
-                        <Form.Control required className='kayfo-signin-input' onChange={(e)=>this.updateInput("password", e.target.value)} type="password" placeholder="Mot de passe*" style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
-                      </Form.Group> */}
-
-                      
-                      <Button variant="default kayfo-signin-btn" style={{width:'100%', marginTop:45}} onClick={this.submitForm} type="submit" size='lg' >Enregistrer</Button>
+                      <Button variant="default kayfo-signin-btn" style={{width:'100%', marginTop:45}} onClick={this.submitForm} type="submit" size='lg' >Envoyer</Button>
 
                     </Form>
                     }   
@@ -174,7 +167,7 @@ any> {
                       <div style={{position:'relative', display:'flex', flexDirection:'column', alignItems:'center'}}>
                         <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                           <Spinner animation="grow" style={{marginBottom:15}} />
-                          <span>Mise à jour de votre compte en cours ...</span>
+                          <span>Réinitialisation en cours ...</span>
                         </div>
                         <Image src={require("../assets/icons/kayfo-icon-white.png")} width={50} style={{position:'relative', bottom:-40, opacity:0.15}} alt="Kayfo"  />
                       </div>
@@ -184,7 +177,7 @@ any> {
                     {this.state.error &&
                       <div style={{position:'relative', display:'flex', flexDirection:'column', alignItems:'center'}}>
                         <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
-                          <span>Email ou nom d'utilisateur incorrect</span>
+                          <span>{this.state.errorMessage}</span>
                           <a href="" style={{color:"#FF7A00"}} >reprendre</a>
                         </div>
                       </div>
@@ -226,4 +219,4 @@ const mapDispatchToProps = (dispatch:any) => {
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(AccountPage));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ResetPasswordPage));

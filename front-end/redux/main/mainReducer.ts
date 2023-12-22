@@ -1,3 +1,5 @@
+import { produce } from "immer";
+
 interface MainState {
     filterTag: string;
     rubrics:any[];
@@ -50,7 +52,16 @@ interface MainState {
     
         
       case MainActionTypes.SET_USER:
-        return { ...state, user: action.payload };
+
+      return produce(state, draftState => {
+
+        let element = action.payload;
+
+       
+        draftState.user = element;
+
+      
+      })  
       
       case MainActionTypes.SET_PAGE_ORIGIN:
         return { ...state, pageOrigin: action.payload };

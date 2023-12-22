@@ -12,6 +12,9 @@ import userService from '../services/user.service';
 import { Alert, Snackbar } from '@mui/material';
 import accountErrors from '../services/mocks/accountErrors';
 
+import { nanoid } from 'nanoid';
+
+
 interface Props {
 
   title : string
@@ -88,16 +91,18 @@ any> {
 
     var phone = this.state.dialCode + this.state.username;
 
-    
 
     if(this.state.navState == "signup")
     {
+
+      const shortId = nanoid(4);
 
       var signupData = 
       {
         username : phone,
         password : this.state.password,
         email : phone+"@kayfo-portal.games",
+        name : "Joueur "+shortId,
         activated : false
       }
         
@@ -186,6 +191,13 @@ any> {
 
   }
 
+
+  requestPassword = ()=>{
+    const { router } = this.props;
+
+    router.push({pathname:"/forgotpassword"})
+  }
+
  
 
    render(): React.ReactNode {
@@ -220,15 +232,15 @@ any> {
                             }
                           </Dropdown.Menu>
                         </Dropdown>
-                        <Form.Control required className='kayfo-signin-input' onChange={(e)=>this.updateInput("username", e.target.value)} type="tel" placeholder="Numéro de mobile*"  style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
+                        <Form.Control required className='kayfo-signin-input' value={this.state.username} onChange={(e)=>this.updateInput("username", e.target.value)} type="tel" placeholder="Numéro de mobile*"  style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
                       </Form.Group>
 
                       <Form.Group className="mb-3" controlId="formBasicPassword">
-                        <Form.Control required className='kayfo-signin-input' onChange={(e)=>this.updateInput("password", e.target.value)} type="password" placeholder="Mot de passe*" style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
+                        <Form.Control required className='kayfo-signin-input' value={this.state.password} onChange={(e)=>this.updateInput("password", e.target.value)} type="password" placeholder="Mot de passe*" style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
 
                         {this.state.navState == "signin" &&
                           <Form.Text className="text-muted" style={{float:'right', marginTop:15}}>
-                            <span style={{color:"#fff"}}>Oups ! </span><a href='#' style={{color:"#FF7A00"}}>Mot de passe oublié ?</a>
+                            <span style={{color:"#fff"}}>Oups ! </span><a onClick={()=>this.requestPassword()} style={{color:"#FF7A00"}}>Mot de passe oublié ?</a>
                           </Form.Text>
                         }
                         
