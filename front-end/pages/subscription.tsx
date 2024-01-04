@@ -240,6 +240,32 @@ any> {
     this.setState({selectedPack : pack})
   }
 
+  async postData(url = "", data = {}) {
+    // Default options are marked with *
+    const response = await fetch(url, {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      // mode: "no-cors", // no-cors, *cors, same-origin
+      // cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      // credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "access-control-allow-origin": "*",
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Methods': '*',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 453c14ca-b3be-3d4c-9913-33cab8f7d693',
+        'country-code':'sn',
+        'mno-name':'orange',
+        'lang':'fr',
+        'channel':'web',
+        'Cookie':'route=1700728895.533.3407.482340|81ae3a9a04c06b83bdb4bb4311fcd72d'
+      },
+      // redirect: "follow", // manual, *follow, error
+      // referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+    return response; // parses JSON response into native JavaScript objects
+  }
+
   gotoPayment(paymentMethod)
   {
     var order_id = this.state.user.id + "_"+new Date().getTime();
@@ -259,18 +285,31 @@ any> {
       }
     }
 
-    this.setState({processing : true})
+    // this.setState({processing : true})
 
-    paymentService.requestPaymentUrl(payload)
-    .then(d=>{
-      console.log(d)
-      // this.setState({processing : false, success:true})
+    // paymentService.requestPaymentUrl(payload)
+    // .then(d=>{
+    //   console.log(d)
+    //   // this.setState({processing : false, success:true})
 
-    })
-    .catch(e=>{
-      console.log(e)
-      // this.setState({processing : false, success:false})
-    })
+    // })
+    // .catch(e=>{
+    //   console.log(e)
+    //   // this.setState({processing : false, success:false})
+    // })
+
+    var data = {
+      "currency": "XOF",
+      "order_id": "Kay_pay006",
+      "amount":100,
+      "state":"testing",
+      "reference": "Kayfo",
+      "cancel_url": "http://strapi-test-1-staging.eu-central-1.elasticbeanstalk.com/payment?success",
+      "return_url": "http://strapi-test-1-staging.eu-central-1.elasticbeanstalk.com/payment?fail",
+      "user_msisdn":"221777632718"
+      }
+
+    this.postData("https://preproduction-gateway.bizao.com/mobilemoney/v1", data)
 
   }
  
