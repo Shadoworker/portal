@@ -8,7 +8,7 @@ const userService = {
   updateUser,
   getUser,
   getUserByMail,
-  getUserByToken
+  getUserByToken,
 };
 
 const resource = "";

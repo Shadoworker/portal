@@ -460,6 +460,44 @@ ul li.page-item.active span
   background-color: var(--kayfo-orange);
 }
 
+.kayfo-subscription-pack, .kayfo-subscription-pack-selected
+{
+  position: relative;
+  display:flex;
+  flex-direction:column; 
+  padding-bottom:8px;
+  padding-top:8px; 
+  background: linear-gradient(0deg, rgba(98,5,48,1) 20%, rgba(68,21,80,1) 100%);
+  border-radius:8px;
+  outline: solid 2px transparent;
+  transition: all ease-in 0.25s;
+  cursor: pointer;
+
+}
+
+.kayfo-subscription-pack:hover
+{
+  outline: solid 2px #A48EFF;
+  transition: all ease-in 0.25s;
+
+}
+
+.kayfo-payment-method
+{
+  background-color: #D9D9D920;
+  padding: 7px;
+  border-radius: 6px;
+  outline: solid 2px transparent;
+  transition: all ease-in 0.25s;
+  cursor: pointer;
+}
+
+.kayfo-payment-method:hover
+{
+  outline: solid 2px #A48EFF;
+  transition: all ease-in 0.25s;
+}
+
 .kayfo-addfav
 {
   padding: 10px;

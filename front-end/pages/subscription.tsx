@@ -12,6 +12,9 @@ import userService from '../services/user.service';
 import { Alert, Snackbar } from '@mui/material';
 import accountErrors from '../services/mocks/accountErrors';
 import moment from 'moment';
+import packs from '../services/mocks/packs';
+import paymentMethods from '../services/mocks/paymentMethods';
+import paymentService from '../services/payment.service';
 
 interface Props {
 
@@ -21,7 +24,7 @@ interface Props {
 const subscriptionsTranslations = {"TRIAL" : "ESSAI", "PACK 30D" : "PREMIUM"}
  
 
-class AccountPage extends Component<any,
+class SubscriptionPage extends Component<any,
 any> {
 
   constructor(props:any)
@@ -47,6 +50,8 @@ any> {
       user : null,
 
       subscriptionCountDown : "",
+
+      selectedPack : null
     };
   }
 
@@ -230,13 +235,44 @@ any> {
 
   }
 
-  
-  gotoSubscription = ()=>{
-    const { router } = this.props;
-
-    router.push({pathname:"/subscription"})
+  selectPack(pack)
+  {
+    this.setState({selectedPack : pack})
   }
 
+  gotoPayment(paymentMethod)
+  {
+    var order_id = this.state.user.id + "_"+new Date().getTime();
+    var user_msisdn = this.state.user.phone;
+
+    var payload = {
+      mno : paymentMethod,
+      data : {
+        currency : "XOF",
+        order_id : "Kaypay_"+order_id,
+        amount : /* this.state.selectedPack.price */ 100,
+        state :"testing",
+        reference : "Kayfo",
+        cancel_url : "http://strapi-test-1-staging.eu-central-1.elasticbeanstalk.com/payment?success",
+        return_url : "http://strapi-test-1-staging.eu-central-1.elasticbeanstalk.com/payment?fail",
+        user_msisdn : user_msisdn
+      }
+    }
+
+    this.setState({processing : true})
+
+    paymentService.requestPaymentUrl(payload)
+    .then(d=>{
+      console.log(d)
+      // this.setState({processing : false, success:true})
+
+    })
+    .catch(e=>{
+      console.log(e)
+      // this.setState({processing : false, success:false})
+    })
+
+  }
  
 
    render(): React.ReactNode {
@@ -246,66 +282,83 @@ any> {
             <Header hidebtn={true} />
             <div className='kayfo-body-content'>
 
-             <div className='kayfo-block-title' style={{textAlign:'center', marginTop:15, textTransform:'uppercase'}}><span>Mon compte</span></div>
+             <div className='kayfo-block-title' style={{textAlign:'center', marginTop:15, textTransform:'uppercase'}}><span>{!this.state.selectedPack? 'Choisissez votre abonnement' : ''}</span></div>
 
               <Container>
                 <Row style={{justifyContent:'center', marginTop:15, color:'#fff'}}>
-                  <Col lg="4" sm="8" xs="11" className='kayfo-signin-box'>
+                  <Col lg="4" sm="8" xs="11" className='kayfo-signin-box' style={{backgroundColor:'#1B0327', paddingTop:20}}>
 
-                    <Row style={{marginBottom:15}}>
-                      <Col style={{flex:1}}>
-                        <span style={{fontSize:14, color:'gainsboro'}}>Mon abonnement</span>
-                      </Col>
-                      <Col style={{display:'flex', justifyContent:'flex-end', flexDirection:'column'}}>
-                        <Row>
-                          <Col style={{display:'flex', justifyContent:'flex-end'}}>
-                            <div style={{position:'relative', padding:'6px 12px', backgroundColor:'#ffffff45', borderRadius:6, overflow:'hidden'}}>
-                              <span style={{fontSize:14, color:'white'}}>{subscriptionsTranslations[this.state.user?.subscription]}</span>
-                            <div style={{width:14, height:14, backgroundColor:'firebrick', position:'absolute', top:-8, left:-8, transform:'rotate(45deg) scale(1.5)'}}></div>
-                            </div>
-                            <Button variant="default kayfo-upgrade-btn" onClick={this.gotoSubscription} type="button" >UPGRADE</Button>
-                          </Col>
-                        </Row>
-                        <Row style={{display:'flex', textAlign:'right'}}>
-                         <span style={{fontSize:12, fontWeight:'bold', color:'orange'}}>{this.state.subscriptionCountDown}</span>
-                        </Row>
-                       
-                      </Col>
-
-                    </Row>
-                    <div style={{width:'100%', height:1, backgroundColor:'gray', margin:'15px 0px'}}></div>
                     <Row>
-                      <Col>
-                      <span style={{fontSize:14, color:'gainsboro'}}>Mes informations</span>
+                      <Col style={{marginBottom: this.state.selectedPack?20:0}}>
+                      <span style={{fontSize:14, color:'gainsboro'}}>{this.state.selectedPack? 'Votre abonnement' : ''}</span>
+                      {this.state.selectedPack && <span style={{fontSize:14, color:'#DA7F14', float:'right', cursor:'pointer'}} onClick={()=>this.selectPack(null)}>Retour</span>}
                       </Col>
                     </Row>
 
-                    {!this.state.processing &&
-                      <Form>
-                        
-                        <Form.Group className="mb-3" controlId="formBasicTel" style={{display:'flex'}}>
-                          <Form.Control required className='kayfo-signin-input' placeholder="tel" disabled value={this.state.user?.username} style={{border:'none', color:'gray', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
-                        </Form.Group>
+                    {!this.state.selectedPack &&
 
-                        <Form.Group className="mb-3" controlId="formBasicName" style={{display:'flex'}}>
-                          <Form.Control required className='kayfo-signin-input' placeholder="nom" defaultValue={this.state.name} onChange={(e)=>this.updateInput("name", e.target.value)} style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
-                        </Form.Group>
+                      <Container>
+                        <Row>
 
-                        <Form.Group className="mb-3" controlId="formBasicMail" style={{display:'flex'}}>
-                          <Form.Control required pattern='/^[^\s@]+@[^\s@]+\.[^\s@]+$/' className='kayfo-signin-input' onChange={(e)=>this.updateInput("email", e.target.value)} defaultValue={this.state.email} type="email" placeholder="Email de recupération"  style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
-                        </Form.Group>
+                          {packs.map((p,i)=>{
 
-                      {/* <Form.Group className="mb-3" controlId="formBasicPassword">
-                        <Form.Control required className='kayfo-signin-input' onChange={(e)=>this.updateInput("password", e.target.value)} type="password" placeholder="Mot de passe*" style={{border:'none', borderBottom:'solid 1px #fff', backgroundColor:'transparent', borderRadius:0}} />
-                      </Form.Group> */}
+                            return <Col key={i} className='kayfo-subscription-pack' onClick={()=>this.selectPack(p)} >
+                              <span style={{fontWeight:'lighter'}}>Validité {p.validityLabel}</span>
+                              <h1 style={{fontWeight:'bold', marginBottom:0}}>{p.price} FCFA</h1>
+                              <span>Résilier à tout moment</span>
 
-                      
-                      <Button variant="default kayfo-signin-btn" style={{width:'100%', marginTop:45}} onClick={this.submitForm} type="submit" size='lg' >Enregistrer</Button>
+                              <Image src={require("../assets/icons/kayfo-icon-white.png")} width={80} style={{position:'absolute', top:'20%', right:'5%', opacity:0.15}} alt="Kayfo"  />
 
-                    </Form>
+                            </Col>
+                            })
+
+                          }
+                        </Row>
+                      </Container>
                     }   
 
-                    {this.state.processing && !this.state.error &&
+                    {this.state.selectedPack &&
+
+                    <Container>
+                      <Row>
+                        <Col className='kayfo-subscription-pack-selected' >
+                          <span style={{fontWeight:'lighter'}}>Validité {this.state.selectedPack.validityLabel}</span>
+                          <h1 style={{fontWeight:'bold', marginBottom:0}}>{this.state.selectedPack.price} FCFA</h1>
+                          <span>Résilier à tout moment</span>
+
+                          <Image src={require("../assets/icons/kayfo-icon-white.png")} width={80} style={{position:'absolute', top:'20%', right:'5%', opacity:0.15}} alt="Kayfo"  />
+
+                        </Col>
+                      </Row>
+
+                      <Row style={{display:'flex', flexDirection:'column'}}>
+                        
+                        <Col style={{marginTop: 20}}>
+                          <span style={{fontSize:14, color:'gainsboro'}}>Moyen de paiement</span>
+                        </Col>
+
+                        <Col>
+                          <Row style={{ display:'flex', flexDirection:'column'}}>
+
+                            {paymentMethods.map((p,i)=>{
+
+                              return <Col key={i} style={{marginTop: 20}} className='kayfo-payment-method' onClick={()=>this.gotoPayment(p.mno)}>
+                                  <Image src={p.icon} width={40} style={{}} alt="payment"  />
+                                  <span style={{fontSize:14, marginLeft:15, fontWeight:'bold', color:'gainsboro'}}>{p.name}</span>
+                                </Col>
+                              })
+
+                            }
+ 
+                          </Row>
+                        </Col>
+
+                      </Row>
+
+                    </Container>
+                    } 
+
+                    {/* {this.state.processing && !this.state.error &&
                       <div style={{position:'relative', display:'flex', flexDirection:'column', alignItems:'center'}}>
                         <div style={{display:'flex', flexDirection:'column', alignItems:'center'}}>
                           <Spinner animation="grow" style={{marginBottom:15}} />
@@ -331,7 +384,7 @@ any> {
                           Compte mis à jour avec succés !
                         </Alert>
                       </Snackbar>
-                    }
+                    } */}
 
                    
 
@@ -363,4 +416,4 @@ const mapDispatchToProps = (dispatch:any) => {
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(AccountPage));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(SubscriptionPage));
