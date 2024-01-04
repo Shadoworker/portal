@@ -79,13 +79,13 @@ State> {
 
       setTimeout(() => {
         
-          new Isotope(".grid", {
-            itemSelector: ".grid-item",
-            layoutMode: "masonry",
-            masonry: {
-              columnWidth: 120,
-            },
-          });
+          // new Isotope(".grid", {
+          //   itemSelector: ".grid-item",
+          //   layoutMode: "masonry",
+          //   masonry: {
+          //     columnWidth: 120,
+          //   },
+          // });
   
       }, 100);
 

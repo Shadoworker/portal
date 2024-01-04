@@ -36,7 +36,7 @@ class GameDetailPage extends Component<any,State> {
 
   componentDidMount(): void {
     
-      window.scrollTo(0,0);
+      // window.scrollTo(0,0);
   }
  
    render(): React.ReactNode {
