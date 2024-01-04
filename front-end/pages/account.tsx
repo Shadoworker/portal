@@ -11,12 +11,14 @@ import Image from 'next/image';
 import userService from '../services/user.service';
 import { Alert, Snackbar } from '@mui/material';
 import accountErrors from '../services/mocks/accountErrors';
+import moment from 'moment';
 
 interface Props {
 
   title : string
 }
  
+const subscriptionsTranslations = {"TRIAL" : "ESSAI", "PACK 30D" : "PREMIUM"}
  
 
 class AccountPage extends Component<any,
@@ -42,7 +44,9 @@ any> {
       password:"",
       repassword:"",
 
-      user : null
+      user : null,
+
+      subscriptionCountDown : "",
     };
   }
 
@@ -55,6 +59,9 @@ any> {
     var userEmail = user?.email == user?.username+"@kayfo-portal.games" ? "" : user?.email; // the default mail
 
     this.setState({user : user, name : user?.name, email:userEmail})
+
+    this.subscriptionLimit(user);
+
   }
  
   switchNavstate = (state:string)=>{
@@ -131,6 +138,98 @@ any> {
 
   }
 
+
+  updateCountdown(targetDate) {
+    // Get the current date and time
+    const currentDate = moment();
+  
+    // Calculate the difference between the target date and the current date
+    const duration = moment.duration(targetDate.diff(currentDate));
+  
+    // Display the remaining time in the format: days, hours, minutes, seconds
+    const days = duration.days();
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+    const seconds = duration.seconds();
+    
+    var countdown = `${days}j : ${hours}h : ${minutes}mn : ${seconds}s`
+    // console.log(`${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds remaining.`);
+
+    return countdown;
+  }
+
+  subscriptionLimit(user)
+  {
+    
+    if(user)
+    {
+      var subscription = user.subscription;
+
+      var valid = false;
+      var countdown = 'expirée';
+      var creationDateString = user.subscriptionDate;
+      const creationDate = moment(creationDateString);
+      var currentDate = moment();
+      var limitDate;
+
+      switch (subscription) {
+        case "TRIAL":
+          
+          var subsDuration = this.props.mainState.trialDuration;
+        
+          //Add subs duration
+          limitDate = creationDate.add(subsDuration, 'hours');
+          // 
+          valid = currentDate.isBefore(limitDate);
+ 
+          break;
+  
+        case "PACK 30D":
+      
+          var subsDuration = this.props.mainState.pack30dDuration;
+  
+          //Add subs duration
+          limitDate = creationDate.add(subsDuration, 'hours');
+  
+          // 
+          valid = currentDate.isBefore(limitDate);
+   
+          break;
+        
+        default:
+          valid = false;
+        break;
+         
+      }
+
+
+      if(currentDate.isBefore(limitDate))
+        countdown = this.updateCountdown(limitDate);
+    
+      this.setState({subscriptionCountDown:countdown})
+      setInterval(() => {
+
+        currentDate = moment();
+
+        if(currentDate.isBefore(limitDate))
+        {
+          countdown = this.updateCountdown(limitDate);
+        }
+        else
+        {
+          countdown = 'expirée'
+        }
+
+        this.setState({subscriptionCountDown:countdown})
+        
+      }, 1000);
+
+    }
+
+    
+
+  }
+
  
 
    render(): React.ReactNode {
@@ -145,6 +244,35 @@ any> {
               <Container>
                 <Row style={{justifyContent:'center', marginTop:15, color:'#fff'}}>
                   <Col lg="4" sm="8" xs="11" className='kayfo-signin-box'>
+
+                    <Row style={{marginBottom:15}}>
+                      <Col style={{flex:1}}>
+                        <span style={{fontSize:14, color:'gainsboro'}}>Mon abonnement</span>
+                      </Col>
+                      <Col style={{display:'flex', justifyContent:'flex-end', flexDirection:'column'}}>
+                        <Row>
+                          <Col style={{display:'flex', justifyContent:'flex-end'}}>
+                            <div style={{position:'relative', padding:'6px 12px', backgroundColor:'#ffffff45', borderRadius:6, overflow:'hidden'}}>
+                              <span style={{fontSize:14, color:'white'}}>{subscriptionsTranslations[this.state.user?.subscription]}</span>
+                            <div style={{width:14, height:14, backgroundColor:'firebrick', position:'absolute', top:-8, left:-8, transform:'rotate(45deg) scale(1.5)'}}></div>
+                            </div>
+                            <Button variant="default kayfo-upgrade-btn" style={{}} type="button" >UPGRADE</Button>
+                          </Col>
+                        </Row>
+                        <Row style={{display:'flex', textAlign:'right'}}>
+                         <span style={{fontSize:12, fontWeight:'bold', color:'orange'}}>{this.state.subscriptionCountDown}</span>
+                        </Row>
+                       
+                      </Col>
+
+                    </Row>
+                    <div style={{width:'100%', height:1, backgroundColor:'gray', margin:'15px 0px'}}></div>
+                    <Row>
+                      <Col>
+                      <span style={{fontSize:14, color:'gainsboro'}}>Mes informations</span>
+                      </Col>
+                    </Row>
+
                     {!this.state.processing &&
                       <Form>
                         
@@ -197,6 +325,8 @@ any> {
                         </Alert>
                       </Snackbar>
                     }
+
+                   
 
                   </Col>
                 </Row>

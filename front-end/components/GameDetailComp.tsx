@@ -10,6 +10,7 @@ import { bindActionCreators} from 'redux';
 import * as mainActions from '../redux/main/mainActions'
 import userService from '../services/user.service';
 import { Alert, Snackbar } from '@mui/material';
+import moment from 'moment';
 
 interface Props {
 
@@ -139,13 +140,62 @@ State> {
 
   }
 
+  isSubscriptionValid()
+  {
+    var subscription = this.state.user.subscription;
+
+    var valid = false;
+    var creationDateString = this.state.user.subscriptionDate;
+    const creationDate = moment(creationDateString);
+    const currentDate = moment();
+    var limitDate;
+
+    switch (subscription) {
+      case "TRIAL":
+        
+        var subsDuration = this.props.mainState.trialDuration;
+      
+        //Add subs duration
+        limitDate = creationDate.add(subsDuration, 'hours');
+        // 
+        valid = currentDate.isBefore(limitDate);
+
+        break;
+
+      case "PACK 30D":
+    
+        var subsDuration = this.props.mainState.pack30dDuration;
+
+        //Add subs duration
+        limitDate = creationDate.add(subsDuration, 'hours');
+
+        // 
+        valid = currentDate.isBefore(limitDate);
  
-   
+
+        break;
+      
+      default:
+        valid = false;
+      break;
+       
+    }
+
+    return valid;
+  }
+ 
   goplayGame = (_game:any)=>{
     // const navigate = useNavigate();
     // this.props.navigate("/gamedetail", {state : {game : _game}})
     
   }
+
+  gotoAccount = ()=>{
+    const { router } = this.props;
+
+    router.push({pathname:"/account"})
+  }
+
 
   gotoLogin = ()=>{
     const { router } = this.props;
@@ -167,8 +217,8 @@ State> {
                     <img  src={baseUrl + this.state.item?.attributes?.banner.data.attributes.url} className='kayfo-game-detail-img' width={this.state.cardWidth || 600} style={{objectFit:'cover', width:'100%', minHeight:250}} alt='' />
                     {/* {this.state.dev && */}
                       <>
-                        {(this.state.user && this.state.user.access == "GRANTED") && <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>}
-                        {(this.state.user && this.state.user.access != "GRANTED") && <Button onClick={()=>{this.state.user.access != "REQUESTED" ? this.requestAccess() : null}} disabled={this.state.user.access == "REQUESTED"} className='kayfo-playnow-btn' >{this.state.user.access != "REQUESTED" ? 'Demander un accés test' : "Demande d'accés envoyée"}</Button>}
+                        {(this.state.user && this.isSubscriptionValid()) && <Button onClick={()=>this.createStat("played",this.state.item?.id)} href={this.state.item?.attributes?.link} target="_blank" className='kayfo-playnow-btn' >Jouer maintenant</Button>}
+                        {(this.state.user && !this.isSubscriptionValid()) && <Button onClick={()=>{this.gotoAccount()}} className='kayfo-playnow-btn' >S'abonner</Button>}
                         {(!this.state.user) && <Button onClick={()=>this.gotoLogin()} className='kayfo-playnow-btn' >Jouer maintenant</Button>}
                       </>
                     {/* } */}

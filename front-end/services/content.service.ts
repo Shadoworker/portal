@@ -13,6 +13,7 @@ const contentService = {
   getNewestProducts,
   getContacts,
 
+  getSubscription
 
  
 };
@@ -120,6 +121,13 @@ function createStat(payload) {
   return api.postData(resource + "/stats", payload);
 }
 
+/**
+ * --- method
+ * @returns
+ */
+function getSubscription() {
+  return api.getData(resource + "/subscription");
+}
 
 
 

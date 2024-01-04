@@ -103,7 +103,8 @@ any> {
         password : this.state.password,
         email : phone+"@kayfo-portal.games",
         name : "Joueur "+shortId,
-        activated : false
+        activated : false,
+        subscriptionDate : new Date()
       }
         
       userService.createUser(signupData).then((d:any)=>{

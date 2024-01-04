@@ -7,6 +7,8 @@ interface MainState {
     game:any;
     user:any;
     pageOrigin : any;
+    trialDuration:number;
+    pack30dDuration:number;
   }
   
   const initialState: MainState = {
@@ -15,7 +17,9 @@ interface MainState {
     allGames : {},
     game : {},
     user : null,
-    pageOrigin : null
+    pageOrigin : null,
+    trialDuration:2,
+    pack30dDuration:720,
   };
   
   export enum MainActionTypes {
@@ -25,6 +29,9 @@ interface MainState {
     SET_GAME = "SET_GAME",
     SET_USER = "SET_USER",
     SET_PAGE_ORIGIN = "SET_PAGE_ORIGIN",
+    
+    SET_TRIAL_DURATION = "SET_TRIAL_DURATION",
+    SET_PACK30D_DURATION = "SET_PACK30D_DURATION",
   }
 
   
@@ -65,7 +72,13 @@ interface MainState {
       
       case MainActionTypes.SET_PAGE_ORIGIN:
         return { ...state, pageOrigin: action.payload };
-      
+            
+      case MainActionTypes.SET_TRIAL_DURATION:
+        return { ...state, trialDuration: action.payload };
+
+      case MainActionTypes.SET_PACK30D_DURATION:
+        return { ...state, pack30dDuration: action.payload };
+
 
       default:
         return state;

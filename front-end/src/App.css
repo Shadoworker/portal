@@ -447,6 +447,19 @@ ul li.page-item.active span
   border-color: var(--kayfo-orange);
 }
 
+.kayfo-upgrade-btn
+{
+  background-color: var(--kayfo-orange-light);
+  font-weight: bold;
+  font-size: 13px;
+  margin-left: 5px;
+}
+
+.kayfo-upgrade-btn:hover
+{
+  background-color: var(--kayfo-orange);
+}
+
 .kayfo-addfav
 {
   padding: 10px;

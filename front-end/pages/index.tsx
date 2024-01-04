@@ -44,6 +44,8 @@ class HomePage extends Component<any, State> {
 
     this.getRubrics();
 
+    this.getSubscription();
+
   }
 
   getRubrics = ()=>{
@@ -64,6 +66,22 @@ class HomePage extends Component<any, State> {
       .catch((e)=>{console.log("Error while getting rubrics")})
     }
 
+  }
+
+  getSubscription()
+  {
+    contentService.getSubscription()
+    .then((d:any)=>{
+      var trialDuration = d.data.attributes.trialDuration
+      var pack30dDuration = d.data.attributes.pack1Duration
+
+      this.props.mainActions.setTrialDuration(trialDuration)
+      this.props.mainActions.setPack30dDuration(pack30dDuration)
+
+    })
+    .catch(e=>{
+      console.log(e)
+    })
   }
 
  

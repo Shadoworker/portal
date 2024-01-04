@@ -44,6 +44,19 @@ export const setPageOrigin = (_payload:any): any => {
   };
 };
 
+export const setTrialDuration = (_payload:any): any => {
+  return {
+    type: MainActionTypes.SET_TRIAL_DURATION,
+    payload : _payload
+  };
+};
+
+export const setPack30dDuration = (_payload:any): any => {
+  return {
+    type: MainActionTypes.SET_PACK30D_DURATION,
+    payload : _payload
+  };
+};
 
 
 
